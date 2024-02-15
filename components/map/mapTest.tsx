@@ -50,7 +50,7 @@ const MapTest = () => {
   // console.log("testing places", place);
 
   return (
-    <div className="w-full h-[500px]">
+    <div className="w-full h-[450px]">
       <GoogleMapReact
         onGoogleApiLoaded={() => {}}
         bootstrapURLKeys={{

@@ -16,7 +16,10 @@ import { useEffect, useRef, useState } from "react";
 
 let uploadRQSTController: AbortController | null = null;
 export default function Home() {
-  const [countryData, setCountryData] = useState<any>([]);
+  const [countryData, setCountryData] = useState<any>({
+    capital: "Lome",
+    name: { common: "Togo" },
+  });
   const [loading, setLoading] = useState(false);
 
   const {
@@ -65,8 +68,6 @@ export default function Home() {
   useEffect(() => {
     allCountriesArray(countryData);
   }, [countryData]);
-
-  console.log("table data array ", tableArray);
 
   const handleSubmit = (e: any) => {
     if (!value) return;
@@ -185,13 +186,11 @@ export default function Home() {
       title: "Coordinates",
       dataIndex: "latlng",
       key: "latlng",
-      render: (value: string) => {
-        return (
-          <p>
-            lat-lng {value[0]},{value[1]}
-          </p>
-        );
-      },
+      render: (value: string) => (
+        <p>
+          lat-lng {value[0]},{value[1]}
+        </p>
+      ),
     },
 
     {
@@ -299,16 +298,12 @@ export default function Home() {
           </div>
         </div>
         <div className="w-full sticky top-0 left-0 z-20 h-[100vh] overflow-scroll flex flex-col justify-between">
-          <div className="h-[67vh] sticky top-0 left-0 pb-10 z-20">
+          <div className="h-[50vh] sticky top-0 left-0 pb-10 z-20">
             <MapTest />
           </div>
 
-          <div className="mt- sticky top-0 left-0 overflow-y-hidden">
-            <CustomTable
-              cols={columns}
-              rows={countryData}
-              isLoading={loading}
-            />
+          <div className="h-[35vh] sticky top-0 left-0 pb-10 z-10 ">
+            <CustomTable cols={columns} rows={tableArray} isLoading={loading} />
           </div>
         </div>
       </main>

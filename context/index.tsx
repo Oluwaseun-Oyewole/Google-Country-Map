@@ -70,9 +70,10 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [countryName, setCountryName] = useState("");
   const [tableArray, setTableArray] = useState<any>([]);
   const allCountriesArray = (data: any) => {
-    setTableArray({ ...tableArray, data });
+    data?.length > 0 && setTableArray((prev: any) => [...prev, ...data]);
   };
 
+  const removeCountryFromArray = () => {};
   return (
     <WeatherContext.Provider
       value={{
