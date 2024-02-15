@@ -1,4 +1,3 @@
-import Header from "@/components/header";
 import Sidebar from "@/components/sidebar";
 import type { Metadata } from "next";
 import Script from "next/script";
@@ -20,11 +19,12 @@ export default function RootLayout({
     <html lang="en">
       <Template>
         <body
-          className={`${lato.variable} font-lato grid grid-flow-col grid-cols-[max-content_auto] items-start bg-dark  relative overflow-hidden`}
+          className={`${lato.variable} font-lato grid grid-flow-col grid-cols-[max-content_auto] items-start bg-dark  relative overflow-x-hidden`}
         >
           <Sidebar />
           <div className={`${poppins.variable} font-poppins`}>
-            <Header /> <div>{children}</div>
+            {/* <Header /> */}
+            <div>{children}</div>
           </div>
 
           <Script

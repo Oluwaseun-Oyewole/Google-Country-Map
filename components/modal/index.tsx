@@ -14,9 +14,10 @@ export type IModalType = {
   close: () => void;
 };
 
-type Props = {} & PropsWithChildren;
+type IModal = "post" | "default";
+type Props = { type?: IModal } & PropsWithChildren;
 const Modal: ForwardRefRenderFunction<IModalType, Props> = (
-  { children },
+  { children, type = "default" },
   ref
 ) => {
   const [open, setOpen] = useState(false);
@@ -43,19 +44,12 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
     },
   }));
 
-  return (
-    <>
-      {open && (
-        <>
-          <motion.div
-            className="text-white fixed top-0 left-0 bg-gray-900 h-screen w-full z-40 cursor-pointer"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0.5, 0.6, 0.85] }}
-            transition={{ duration: 1.5 }}
-            onClick={handleCancel}
-          />
+  const returnModal = () => {
+    switch (type) {
+      case "default":
+        return (
           <div
-            className="absolute top-0 left-0 flex z-50 text-white translate-y-2/4 translate-x-full"
+            className="fixed top-0 left-0 flex z-50 text-white translate-y-2/4 translate-x-full "
             // ref={modalRef}
             // onClick={outsideClick}
           >
@@ -75,6 +69,46 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
               {children}
             </motion.div>
           </div>
+        );
+      case "post":
+        return (
+          <div className="mt-4 fixed top-0 left-0 flex z-50 w-full text-white items-center justify-center">
+            <motion.div
+              className="w-1/2 bg-dark flex justify-between items-center p-5 "
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.5, 0.6, 0.85, 1] }}
+              transition={{
+                duration: 1.5,
+              }}
+            >
+              <p className="text-sm">Place Added</p>
+              <p
+                className="cursor-pointer text-green-500"
+                onClick={handleCancel}
+              >
+                close
+              </p>
+            </motion.div>
+          </div>
+        );
+
+      default:
+        break;
+    }
+  };
+
+  return (
+    <>
+      {open && (
+        <>
+          <motion.div
+            className="text-white fixed top-0 left-0 bg-gray-900 h-screen w-full z-40 cursor-pointer"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.5, 0.6, 0.85] }}
+            transition={{ duration: 1.5 }}
+            onClick={handleCancel}
+          />
+          {returnModal()}
         </>
       )}
     </>

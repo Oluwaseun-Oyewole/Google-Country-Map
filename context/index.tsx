@@ -9,6 +9,8 @@ import React, {
 
 interface PlaceType {
   country: string;
+  lat: number;
+  long: number;
 }
 
 interface CoordinateType {
@@ -16,38 +18,59 @@ interface CoordinateType {
   lng: number;
 }
 
+type CountryArrayType = {
+  name: string;
+}[];
+
 interface WeatherCountryType {
+  countryName: string;
+  setCountryName: React.Dispatch<React.SetStateAction<string>>;
   countries: CountryEntries[];
   setCountries: React.Dispatch<React.SetStateAction<CountryEntries[]>>;
   createCountries: (country: CountryEntries) => void;
-  place?: PlaceType;
-  addPlace: (place: string) => void;
+  place: PlaceType;
+  addPlace: (place: PlaceType) => void;
   setPlace: React.Dispatch<React.SetStateAction<PlaceType>>;
   coordinate: CoordinateType;
   setCoordinate: React.Dispatch<React.SetStateAction<CoordinateType>>;
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
+  tableArray: Array<any>;
+  allCountriesArray: (data: any) => void;
 }
 
 const WeatherContext = createContext<WeatherCountryType | undefined>(undefined);
 export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [countries, setCountries] =
     useState<CountryEntries[]>(countryDataEntries);
-  const [place, setPlace] = useState<PlaceType>({ country: "Osun" });
-  const [coordinate, setCoordinate] = useState<CoordinateType>({
-    lng: 0,
+  const [place, setPlace] = useState<PlaceType>({
+    country: "",
     lat: 0,
+    long: 0,
   });
-  const addPlace = (newPlace: string) => {
-    return setPlace({ ...place, country: newPlace });
+  const [coordinate, setCoordinate] = useState<CoordinateType>({
+    lat: 0,
+    lng: 0,
+  });
+  const addPlace = (newPlace: PlaceType) => {
+    return setPlace({
+      ...place,
+      country: newPlace.country,
+      lat: newPlace.lat,
+      long: newPlace.long,
+    });
   };
   const [value, setValue] = useState("");
-
   const createCountries = (countryData: CountryEntries) => {
     return setCountries([
       ...countries,
       { country: countryData.country, image: countryData.image },
     ]);
+  };
+  const [countryName, setCountryName] = useState("");
+  const [tableArray, setTableArray] = useState<any>([]);
+  const allCountriesArray = (data: any) => {
+    setTableArray({ ...tableArray, data });
   };
 
   return (
@@ -63,6 +86,10 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
         setCoordinate,
         value,
         setValue,
+        countryName,
+        setCountryName,
+        tableArray,
+        allCountriesArray,
       }}
     >
       {children}

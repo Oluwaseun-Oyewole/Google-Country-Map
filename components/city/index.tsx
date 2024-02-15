@@ -47,7 +47,7 @@ const City = () => {
             },
             1440: {
               slidesPerView: 3,
-              spaceBetween: 5,
+              spaceBetween: 7,
             },
           }}
         >

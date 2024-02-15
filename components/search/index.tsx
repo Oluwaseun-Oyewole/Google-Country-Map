@@ -13,14 +13,28 @@ const GooglePlaceSearch: React.FC<ISearchPropsType> = ({ isClassName }) => {
   const searchParamsQuery = searchParams.get("query");
   let autoCompleteRef = useRef(null);
   const [query, setQuery] = useState(searchParamsQuery ?? "");
-  const { addPlace, coordinate, setCoordinate, setValue } = useCountryData();
+  const {
+    addPlace,
+    coordinate,
+    setCoordinate,
+    setValue,
+    value,
+    setCountryName,
+  } = useCountryData();
+
   const updateURLFromSearchQuery = (query: any) => {
     const params = new URLSearchParams(searchParams);
     params.set("query", query);
     router.push(`?${params.toString()}`);
   };
   const options = {
-    fields: ["formatted_address", "geometry", "name", "address_components"],
+    fields: [
+      "formatted_address",
+      "geometry",
+      "name",
+      "address_components",
+      "adr_address",
+    ],
     strictBounds: false,
   };
   let autoComplete: any;
@@ -31,6 +45,7 @@ const GooglePlaceSearch: React.FC<ISearchPropsType> = ({ isClassName }) => {
     );
     autoComplete.addListener("place_changed", () => {
       const place = autoComplete.getPlace();
+
       if (!place?.geometry || !place?.geometry.location) {
         window.alert("No details available for input:'" + place?.name + "'");
         return;
@@ -40,7 +55,12 @@ const GooglePlaceSearch: React.FC<ISearchPropsType> = ({ isClassName }) => {
           lat: place?.geometry.location.lat(),
           lng: place?.geometry.location.lng(),
         });
-        addPlace(place?.formatted_address);
+        addPlace({
+          country: place?.formatted_address,
+          lat: place?.geometry.location.lat(),
+          long: place?.geometry.location.lat(),
+        });
+        setCountryName(place?.adr_address);
         place?.formatted_address;
         setValue(place?.formatted_address);
         updateURLFromSearchQuery(place?.address_components[0]?.long_name);
@@ -59,15 +79,16 @@ const GooglePlaceSearch: React.FC<ISearchPropsType> = ({ isClassName }) => {
   return (
     <div className={`${isClassName ? "pl-8 w-full" : "mt-4"} `}>
       <Input
+        defaultValue={query}
         type="search"
         ref={autoCompleteRef}
         onChange={(event) => {
+          setValue(event?.target?.value);
           setQuery(autoComplete?.current?.value);
-
-          console.log("handling change from here -- ....");
         }}
-        value={query}
+        value={value ? value : query}
         placeholder="Search new place"
+        setQuery={setQuery}
       />
     </div>
   );

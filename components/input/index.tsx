@@ -1,9 +1,10 @@
 "use client";
 import Search from "@/assets/search.svg";
+import { useCountryData } from "@/context";
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
+import React, {
   DetailedHTMLProps,
   InputHTMLAttributes,
   LegacyRef,
@@ -29,6 +30,7 @@ export type InputPropsType = {
   size?: InputSize;
   className?: string;
   value?: string;
+  setQuery: React.Dispatch<React.SetStateAction<string>>;
 } & Omit<
   DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
   "size"
@@ -51,6 +53,7 @@ const Input = (
     placeholder,
     value,
     onChange,
+    setQuery,
     ...props
   }: InputPropsType,
   ref: LegacyRef<HTMLInputElement> | any
@@ -58,12 +61,18 @@ const Input = (
   const [textType, ,] = useState(type);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { setValue } = useCountryData();
 
   const removeParamsFromURL = () => {
     const params = new URLSearchParams(searchParams);
     params.delete("query");
     router.push(`?${params.toString()}`);
+    setValue("");
+    setQuery("");
   };
+
+  // console.log("value", value);
+  // console.log("reference", ref?.current?.value);
 
   return (
     <div className="flex relative">
@@ -89,6 +98,15 @@ const Input = (
         )}
         {...props}
       />
+
+      {value && (
+        <p
+          className="absolute top-5 right-5 text-xs cursor-pointer text-green-500 font-bold"
+          onClick={removeParamsFromURL}
+        >
+          clear
+        </p>
+      )}
     </div>
   );
 };
