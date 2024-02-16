@@ -1,20 +1,27 @@
 "use client";
 import Plus from "@/assets/plus.svg";
 import Button from "@/components/button";
+import { WeatherChart } from "@/components/chart";
 import City from "@/components/city";
 import MapTest from "@/components/map/mapTest";
 import Modal, { IModalType } from "@/components/modal";
-import GooglePlaceSearch from "@/components/search";
 import CustomTable from "@/components/table";
 import { useCountryData } from "@/context";
 import selectRandomImage, { imageUrls, items, truncate } from "@/helper";
 import Request from "@/services";
 import { Endpoints } from "@/services/endpoints";
+import { getWeatherForecasts } from "@/services/weather";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 let uploadRQSTController: AbortController | null = null;
+type WeatherResponse = {
+  day: string;
+  high: string;
+  low: string;
+  text: string;
+};
 export default function Home() {
   const [countryData, setCountryData] = useState<any>({
     capital: "Lome",
@@ -33,6 +40,7 @@ export default function Home() {
     tableArray,
   } = useCountryData();
 
+  const cache = useRef<any>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const modalRef = useRef<IModalType>(null);
@@ -40,6 +48,8 @@ export default function Home() {
   const handleOpenModal = () => {
     modalRef?.current?.open();
   };
+
+  const [weatherChartData, setWeatherChartData] = useState([]);
 
   // get country for search autocomplete fields
   const countryRegex = /<span class="country-name">(.*?)<\/span>/;
@@ -219,12 +229,55 @@ export default function Home() {
     },
   ];
 
+  const fetchChartWeatherForecast = async (location: string) => {
+    if (!location || location === "") return;
+    else {
+      if (cache.current[location]) {
+        const data = cache.current[location];
+        setWeatherChartData(data);
+      } else {
+        const res = await getWeatherForecasts({ location: location });
+        if (res) {
+          cache.current[location] = res?.forecasts;
+          setWeatherChartData(res?.forecasts);
+        } else {
+          setWeatherChartData([]);
+        }
+      }
+    }
+  };
+  useEffect(() => {
+    // fetchChartWeatherForecast("Ghana");
+  }, []);
+
+  const weekDays = weatherChartData?.map(
+    (weather: WeatherResponse) => weather?.day
+  );
+  const highWeekDay = weatherChartData?.map(
+    (weather: WeatherResponse) => weather?.high
+  );
+  const lowWeekDay = weatherChartData?.map(
+    (weather: WeatherResponse) => weather?.low
+  );
+
+  const areaSeries = [
+    {
+      name: "High",
+      data: highWeekDay,
+    },
+
+    {
+      name: "Low",
+      data: lowWeekDay,
+    },
+  ];
+
   return (
     <>
       <Modal ref={modal} type="post" />
       <Modal ref={modalRef}>
         <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
-          <GooglePlaceSearch />
+          {/* <GooglePlaceSearch /> */}
           <div>
             <div
               className="cursor-pointer flex gap-2 justify-between items-center w-full"
@@ -263,18 +316,18 @@ export default function Home() {
         </Button>
       </Modal>
 
-      <main className="grid grid-flow-col grid-cols-[55%_40%] justify-between bg-dark text-white">
-        <div>
-          <div className="pt-4  pb-2 sticky top-0 left-0 bg-dark z-20">
+      <main className="max-w-[92%] md:max-w-[95%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
+        <div className="lg:h-screen lg:overflow-y-scroll">
+          <div className="pt-4 pb-2 sticky top-0 left-0 bg-dark z-20">
             <div className="w-[80%]">
-              <GooglePlaceSearch isClassName />
+              {/* <GooglePlaceSearch isClassName /> */}
             </div>
           </div>
-          <div className="pl-8 relative pt-10">
-            <div className="w-full grid grid-flow-col grid-cols-[70%_25%] justify-between items-center">
+          <div className="relative pt-10">
+            <div className="w-full grid grid-flow-col grid-cols-[50%_45%] gap-2 md:grid-cols-[70%_25%] justify-between items-center">
               <City />
               <div
-                className="bg-transparent border-2 border-secondary w-full flex flex-col gap-2 items-center justify-center h-[190px] rounded-xl cursor-pointer"
+                className="bg-transparent border-2 border-secondary w-full flex flex-col gap-2 items-center justify-center h-[170px] md:h-[190px] rounded-xl cursor-pointer"
                 onClick={handleOpenModal}
               >
                 <Image src={Plus} alt="add city" />
@@ -282,27 +335,58 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex gap-2 justify-between w-full pt-10">
-              {items?.map((item, index) => {
+            <div>
+              <div className="flex gap-2 justify-between w-full pt-2 md:pt-10 overflow-scroll">
+                {items?.map((item, index) => {
+                  return (
+                    <motion.div
+                      key={index}
+                      className="bg-secondary px-5 py-3 flex items-center justify-center rounded-sm cursor-not-allowed"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      <Image src={item} alt="" className="w-7" />
+                    </motion.div>
+                  );
+                })}
+              </div>
+              <div className="pt-4 md:pt-10">
+                <div className="flex justify-between items-center text-sm text-[#ACAFC8] ">
+                  <p className="">{countryName} Weather Forecast</p>{" "}
+                  <p className="text-xs">Forecast for the month</p>
+                </div>
+                <WeatherChart
+                  id="area-chart"
+                  type="line"
+                  colors={["#B619A6", "#380ABB"]}
+                  series={areaSeries}
+                  categories={weekDays}
+                  curve="smooth"
+                  xaxisLabel={false}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-flow-col grid-cols-[auto] items-center overflow-x-scroll gap-2 pb-4 lg:pb-8">
+              {weatherChartData?.map((weather: WeatherResponse, index) => {
                 return (
-                  <motion.div
+                  <div
                     key={index}
-                    className="bg-secondary px-5 py-3 flex items-center justify-center rounded-sm cursor-not-allowed"
-                    whileHover={{ scale: 1.1 }}
+                    className="text-xs items-center gap-2 w-[30%]"
                   >
-                    <Image src={item} alt="" className="w-7" />
-                  </motion.div>
+                    <p className="text-[8px]">{weather?.day}</p>
+                    <p className="text-[8px]">{weather?.text}</p>
+                  </div>
                 );
               })}
             </div>
           </div>
         </div>
-        <div className="w-full sticky top-0 left-0 z-20 h-[100vh] overflow-scroll flex flex-col justify-between">
-          <div className="h-[50vh] sticky top-0 left-0 pb-10 z-20">
+        <div className="w-full sticky top-0 left-0 z-20 md:h-[100vh] flex flex-col justify-between">
+          <div className="md:h-[50vh] sticky top-0 left-0 pb-10 z-20">
             <MapTest />
           </div>
 
-          <div className="h-[35vh] sticky top-0 left-0 pb-10 z-10 ">
+          <div className="md:h-[35vh] sticky top-0 left-0 pb-10 z-10">
             <CustomTable cols={columns} rows={tableArray} isLoading={loading} />
           </div>
         </div>

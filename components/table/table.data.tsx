@@ -11,7 +11,7 @@ function TableData({ row, col, className }: ITableData) {
   switch (col.dataIndex) {
     default:
       template = (
-        <span className="text-xs w-full pt-4 pb-5 grid grid-flow-col grid-cols-[max-content_auto_max-content] items-center gap-2">
+        <span className="text-xs pt-4 pb-5 grid grid-flow-col grid-cols-[max-content_auto_max-content] items-center gap-2">
           {col.render ? <>{col.render(row[col.key])}</> : row[col.key]}
         </span>
       );

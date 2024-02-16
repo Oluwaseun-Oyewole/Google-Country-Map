@@ -31,7 +31,7 @@ const City = () => {
             disableOnInteraction: false,
           }}
           breakpoints={{
-            0: { slidesPerView: 1 },
+            0: { slidesPerView: 1, spaceBetween: 5 },
 
             640: {
               slidesPerView: 2,
@@ -39,15 +39,15 @@ const City = () => {
             },
             768: {
               slidesPerView: 3,
-              spaceBetween: 40,
+              spaceBetween: 5,
             },
             1024: {
               slidesPerView: 3,
-              spaceBetween: 50,
+              spaceBetween: 10,
             },
             1440: {
               slidesPerView: 3,
-              spaceBetween: 7,
+              spaceBetween: 10,
             },
           }}
         >
@@ -57,7 +57,7 @@ const City = () => {
                 <SwiperSlide key={index}>
                   <div
                     key={index}
-                    className={` flex flex-col  w-full md:w-[170px] lg:w-[200px] min-h-[200px] pt-7 pb-5 px-4 rounded-lg justify-between hover:scale-105 transition-all ease-in-out duration-500 cursor-pointer`}
+                    className={` flex flex-col  w-full md:w-[170px] lg:w-[200px] min-h-[200px] pt-7 pb-5 rounded-lg justify-between hover:scale-105 transition-all ease-in-out duration-500 cursor-pointer`}
                   >
                     <div key={index}>
                       <p className="flex items-center justify-center  text-xs !font-light">

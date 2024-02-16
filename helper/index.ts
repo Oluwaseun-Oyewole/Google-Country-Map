@@ -20,9 +20,6 @@ export default function selectRandomImage(images: string[]): string | null {
 export const items = [Icon1, Icon2, Icon3, Icon4, Icon5, Icon6, Icon7, Icon8];
 export const imageUrls = [Pakistan, Mosco];
 
-// export const truncate = (text: string, n: number) =>
-//   text?.length > n ? text?.substr(0, n - 1) + "..." : text;
-
 export const truncate = (str: string, n: number): string => {
   if (str?.length <= n) {
     return str;

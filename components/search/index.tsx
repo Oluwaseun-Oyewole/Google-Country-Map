@@ -43,9 +43,14 @@ const GooglePlaceSearch: React.FC<ISearchPropsType> = ({ isClassName }) => {
       autoCompleteRef.current,
       options
     );
+
+    // autoComplete = new window["google"]["maps"]["places"]["Autocomplete"](
+    //   autoCompleteRef.current,
+    //   options
+    // );
+
     autoComplete.addListener("place_changed", () => {
       const place = autoComplete.getPlace();
-
       if (!place?.geometry || !place?.geometry.location) {
         window.alert("No details available for input:'" + place?.name + "'");
         return;
@@ -70,9 +75,11 @@ const GooglePlaceSearch: React.FC<ISearchPropsType> = ({ isClassName }) => {
   useEffect(() => {
     if (typeof window !== undefined && !window.google) {
       setTimeout(() => {
+        console.log("no window to use!!!!");
         loadGoogleAutoComplete(autoCompleteRef);
       }, 1000);
     }
+    console.log("window is defined!!!!");
     loadGoogleAutoComplete(autoCompleteRef);
   }, []);
 
@@ -89,6 +96,7 @@ const GooglePlaceSearch: React.FC<ISearchPropsType> = ({ isClassName }) => {
         value={value ? value : query}
         placeholder="Search new place"
         setQuery={setQuery}
+        className="pac-input"
       />
     </div>
   );

@@ -4,12 +4,11 @@ import TableData from "./table.data";
 import { ITable } from "./types";
 
 function CustomTable({ cols, rows, isLoading, emptyTableStyle }: ITable) {
-  let test;
   return (
-    <div className="w-full h-[450px] overflow-x-scroll">
+    <div className="lg:w-full h-[300px] overflow-x-scroll">
       <table
         className={classNames(
-          `w-full text-left border-spacing-y-3.5 border-spacing-x-3.5 bg-gray-800`,
+          `text-left border-spacing-y-3.5 border-spacing-x-3.5 bg-gray-800`,
           isLoading ? "animate-pulsed" : ""
         )}
       >
@@ -28,7 +27,7 @@ function CustomTable({ cols, rows, isLoading, emptyTableStyle }: ITable) {
           </tr>
         </thead>
 
-        <tbody className="w-[90%] px-5">
+        <tbody className="px-5">
           {isLoading ? (
             <tr>
               <td colSpan={9999}>

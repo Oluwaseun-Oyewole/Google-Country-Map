@@ -4,7 +4,9 @@ import {
   ForwardRefRenderFunction,
   PropsWithChildren,
   forwardRef,
+  useEffect,
   useImperativeHandle,
+  useRef,
   useState,
 } from "react";
 import Button from "../button";
@@ -21,13 +23,8 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
   ref
 ) => {
   const [open, setOpen] = useState(false);
-  // const modalRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
-  // const outsideClick = (e: any) => {
-  //   if (modalRef?.current && !modalRef?.current?.contains(e.target)) {
-  //     setOpen(false);
-  //   }
-  // };
   const handleCancel = () => {
     setOpen(false);
   };
@@ -44,37 +41,51 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
     },
   }));
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef?.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        console.log("Clicked outside the div");
+        handleCancel();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const returnModal = () => {
     switch (type) {
       case "default":
         return (
-          <div
-            className="fixed top-0 left-0 flex z-50 text-white translate-y-2/4 translate-x-full "
-            // ref={modalRef}
-            // onClick={outsideClick}
+          <motion.div
+            className="absolute left-0 w-full h-full overflow-hidden flex justify-center top-0 items-center z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: [0.5, 0.6, 0.85, 1] }}
+            transition={{
+              duration: 1.5,
+            }}
           >
-            <motion.div
-              className="w-[500px] bg-dark"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.5, 0.6, 0.85, 1] }}
-              transition={{
-                duration: 1.5,
-              }}
+            <div
+              className="w-[90%] md:w-[500px] bg-dark absolute"
+              ref={modalRef}
             >
-              <div className="flex items-end justify-end">
-                <Button onClick={handleCancel} className="w-3/12 !p-5 text-sm">
-                  Close
-                </Button>
+              <div>
+                <Button onClick={handleCancel}>Close</Button>
               </div>
               {children}
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         );
       case "post":
         return (
-          <div className="mt-4 fixed top-0 left-0 flex z-50 w-full text-white items-center justify-center">
+          <div className="mt-4 fixed top-0 left-0 flex z-50  w-full text-white items-center justify-center">
             <motion.div
-              className="w-1/2 bg-dark flex justify-between items-center p-5 "
+              className="w-[90%] lg:w-1/2 bg-dark flex justify-between items-center p-5 "
               initial={{ opacity: 0 }}
               animate={{ opacity: [0.5, 0.6, 0.85, 1] }}
               transition={{

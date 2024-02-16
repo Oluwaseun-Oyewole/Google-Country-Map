@@ -73,7 +73,6 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
     data?.length > 0 && setTableArray((prev: any) => [...prev, ...data]);
   };
 
-  const removeCountryFromArray = () => {};
   return (
     <WeatherContext.Provider
       value={{

@@ -19,17 +19,18 @@ export default function RootLayout({
     <html lang="en">
       <Template>
         <body
-          className={`${lato.variable} font-lato grid grid-flow-col grid-cols-[max-content_auto] items-start bg-dark  relative overflow-x-hidden`}
+          className={`${lato.variable} font-lato grid grid-flow-col grid-cols-[max-content_auto] bg-dark overflow-hidden`}
         >
           <Sidebar />
-          <div className={`${poppins.variable} font-poppins`}>
-            {/* <Header /> */}
+          <div
+            className={`${poppins.variable} font-poppins overflow-scroll md:overflow-hidden h-screen w-full`}
+          >
             <div>{children}</div>
           </div>
 
           <Script
             type="application/javascript"
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXqsbttMeW0CjxvTvIzi3_z5wlq74MKyA&libraries=places"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBd0vAku9eywLaQkzxlE0iwFb8aSu9OEyI&libraries=places"
             strategy="beforeInteractive"
           />
         </body>
