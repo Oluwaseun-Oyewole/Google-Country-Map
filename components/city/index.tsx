@@ -51,16 +51,16 @@ const City = () => {
             },
           }}
         >
-          <div className="flex gap-4">
+          <div>
             {countries?.map((country, index) => {
               return (
                 <SwiperSlide key={index}>
                   <div
                     key={index}
-                    className={` flex flex-col  w-full md:w-[170px] lg:w-[200px] min-h-[200px] pt-7 pb-5 rounded-lg justify-between hover:scale-105 transition-all ease-in-out duration-500 cursor-pointer`}
+                    className={`flex w-full md:w-[170px] lg:w-[200px] min-h-[200px] pt-7 pb-5 rounded-lg justify-between hover:scale-105 transition-all ease-in-out duration-500 cursor-pointer`}
                   >
                     <div key={index}>
-                      <p className="flex items-center justify-center  text-xs !font-light">
+                      <p className="text-center text-xs !font-light">
                         {truncate(country.country, 17)}
                       </p>
 

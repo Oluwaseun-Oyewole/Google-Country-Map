@@ -1,10 +1,11 @@
 "use client";
 import Plus from "@/assets/plus.svg";
 import Button from "@/components/button";
-import { WeatherChart } from "@/components/chart";
 import City from "@/components/city";
+import Spinner from "@/components/loader";
 import MapTest from "@/components/map/mapTest";
 import Modal, { IModalType } from "@/components/modal";
+import GooglePlaceSearch from "@/components/search";
 import CustomTable from "@/components/table";
 import { useCountryData } from "@/context";
 import selectRandomImage, { imageUrls, items, truncate } from "@/helper";
@@ -23,15 +24,13 @@ type WeatherResponse = {
   text: string;
 };
 export default function Home() {
-  const [countryData, setCountryData] = useState<any>({
-    capital: "Lome",
-    name: { common: "Togo" },
-  });
-  const [loading, setLoading] = useState(false);
+  const [countryData, setCountryData] = useState<any>();
+  const [loading, setLoading] = useState(true);
 
   const {
     countries,
     value,
+    setValue,
     createCountries,
     coordinate,
     countryName,
@@ -41,6 +40,7 @@ export default function Home() {
   } = useCountryData();
 
   const cache = useRef<any>({});
+  const countryCache = useRef<any>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const modalRef = useRef<IModalType>(null);
@@ -48,38 +48,44 @@ export default function Home() {
   const handleOpenModal = () => {
     modalRef?.current?.open();
   };
-
   const [weatherChartData, setWeatherChartData] = useState([]);
-
+  const testRef = useRef(null);
   // get country for search autocomplete fields
   const countryRegex = /<span class="country-name">(.*?)<\/span>/;
   const match = countryName.match(countryRegex);
   const country = match ? match[1] : "";
 
-  const fetchCountryInfo = async () => {
+  const fetchCountryInfo = async (country: string) => {
     setLoading(true);
-    if (countryName) {
-      try {
-        const res = await Request.get(`${Endpoints.country}${country}`);
-        if (countryName && res) {
-          setCountryData(res);
+    if (!country || (country === "" && !countryName)) {
+      setLoading(false);
+    } else {
+      if (countryCache.current[country]) {
+        const data = countryCache.current[country];
+        setCountryData(data);
+      } else {
+        try {
+          const res = await Request.get(`${Endpoints.country}${country}`);
+          if (countryName && res) {
+            setCountryData(res);
+          }
+        } catch (error) {
+          console.log("error while fetching");
         }
-      } catch (error) {
-        console.log("error while fetching");
       }
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchCountryInfo();
+    fetchCountryInfo(country);
   }, [countryName]);
 
   useEffect(() => {
     allCountriesArray(countryData);
   }, [countryData]);
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = () => {
     if (!value) return;
     createCountries({
       country: value,
@@ -87,6 +93,7 @@ export default function Home() {
     });
     modalRef?.current?.close();
     setFile(null);
+    setValue("");
     modal?.current?.open();
 
     // flor handling file submission
@@ -130,7 +137,7 @@ export default function Home() {
       key: "capitalInfo",
       render: (item: any) => (
         <p className="!text-sm">
-          {item?.latlng[0]}, {item?.latlng[1]}
+          {item && item?.latlng[0]}, {item && item?.latlng[1]}
         </p>
       ),
     },
@@ -198,7 +205,7 @@ export default function Home() {
       key: "latlng",
       render: (value: string) => (
         <p>
-          lat-lng {value[0]},{value[1]}
+          lat-lng {value && value[0]},{value && value[1]}
         </p>
       ),
     },
@@ -230,8 +237,10 @@ export default function Home() {
   ];
 
   const fetchChartWeatherForecast = async (location: string) => {
-    if (!location || location === "") return;
-    else {
+    setLoading(true);
+    if (!location || location === "") {
+      setLoading(false);
+    } else {
       if (cache.current[location]) {
         const data = cache.current[location];
         setWeatherChartData(data);
@@ -245,10 +254,11 @@ export default function Home() {
         }
       }
     }
+    setLoading(false);
   };
   useEffect(() => {
-    // fetchChartWeatherForecast("Ghana");
-  }, []);
+    // fetchChartWeatherForecast(country);
+  }, [country]);
 
   const weekDays = weatherChartData?.map(
     (weather: WeatherResponse) => weather?.day
@@ -277,7 +287,7 @@ export default function Home() {
       <Modal ref={modal} type="post" />
       <Modal ref={modalRef}>
         <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
-          {/* <GooglePlaceSearch /> */}
+          <GooglePlaceSearch ref={testRef} />
           <div>
             <div
               className="cursor-pointer flex gap-2 justify-between items-center w-full"
@@ -316,14 +326,14 @@ export default function Home() {
         </Button>
       </Modal>
 
-      <main className="max-w-[92%] md:max-w-[95%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
+      <main className="max-w-[92%] pl-0 md:pl-8 md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
         <div className="lg:h-screen lg:overflow-y-scroll">
-          <div className="pt-4 pb-2 sticky top-0 left-0 bg-dark z-20">
-            <div className="w-[80%]">
-              {/* <GooglePlaceSearch isClassName /> */}
+          <div className="pt-6 sticky top-0 left-0 bg-dark z-20">
+            <div className="w-full md:w-[80%]">
+              <GooglePlaceSearch isClassName ref={testRef} />
             </div>
           </div>
-          <div className="relative pt-10">
+          <div className="relative pt-8 md:pt-14">
             <div className="w-full grid grid-flow-col grid-cols-[50%_45%] gap-2 md:grid-cols-[70%_25%] justify-between items-center">
               <City />
               <div
@@ -351,10 +361,11 @@ export default function Home() {
               </div>
               <div className="pt-4 md:pt-10">
                 <div className="flex justify-between items-center text-sm text-[#ACAFC8] ">
-                  <p className="">{countryName} Weather Forecast</p>{" "}
+                  <p className="">{country} Weather Forecast</p>{" "}
                   <p className="text-xs">Forecast for the month</p>
                 </div>
-                <WeatherChart
+
+                {/* <WeatherChart
                   id="area-chart"
                   type="line"
                   colors={["#B619A6", "#380ABB"]}
@@ -362,31 +373,45 @@ export default function Home() {
                   categories={weekDays}
                   curve="smooth"
                   xaxisLabel={false}
-                />
+                /> */}
               </div>
             </div>
 
-            <div className="grid grid-flow-col grid-cols-[auto] items-center overflow-x-scroll gap-2 pb-4 lg:pb-8">
-              {weatherChartData?.map((weather: WeatherResponse, index) => {
-                return (
-                  <div
-                    key={index}
-                    className="text-xs items-center gap-2 w-[30%]"
-                  >
-                    <p className="text-[8px]">{weather?.day}</p>
-                    <p className="text-[8px]">{weather?.text}</p>
-                  </div>
-                );
-              })}
+            <div className="grid grid-flow-col grid-cols-[auto] items-start overflow-x-scroll gap-2 py-6 lg:pb-8">
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <Spinner />
+                </div>
+              ) : (
+                <>
+                  {weatherChartData.length === 0 ? (
+                    <p className="text-sm ">Weather forecast unavailable</p>
+                  ) : (
+                    weatherChartData?.map(
+                      (weather: WeatherResponse, index: number) => {
+                        return (
+                          <div
+                            key={index}
+                            className="text-xs items-center gap-8"
+                          >
+                            <p className="text-[8px]">{weather?.day}</p>
+                            <p className="text-[8px]">{weather?.text}</p>
+                          </div>
+                        );
+                      }
+                    )
+                  )}
+                </>
+              )}
             </div>
           </div>
         </div>
-        <div className="w-full sticky top-0 left-0 z-20 md:h-[100vh] flex flex-col justify-between">
-          <div className="md:h-[50vh] sticky top-0 left-0 pb-10 z-20">
+        <div className="w-full sticky top-0 left-0 z-20 flex flex-col justify-between pb-8 h-[100vh] overflow-y-scroll">
+          <div className="h-[55vh]">
             <MapTest />
           </div>
 
-          <div className="md:h-[35vh] sticky top-0 left-0 pb-10 z-10">
+          <div className="md:h-[35vh] sticky top-0 left-0 z-10">
             <CustomTable cols={columns} rows={tableArray} isLoading={loading} />
           </div>
         </div>

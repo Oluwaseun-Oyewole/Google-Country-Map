@@ -23,7 +23,7 @@ export default function RootLayout({
         >
           <Sidebar />
           <div
-            className={`${poppins.variable} font-poppins overflow-scroll md:overflow-hidden h-screen w-full`}
+            className={`${poppins.variable} font-poppins overflow-scroll lg:overflow-hidden h-screen w-full`}
           >
             <div>{children}</div>
           </div>

@@ -52,15 +52,11 @@ function CustomTable({ cols, rows, isLoading, emptyTableStyle }: ITable) {
 
           {rows?.length > 0
             ? rows?.map((row, idx) => (
-                <>
-                  <tr key={idx} className="text-sm text-[#464F54] ">
-                    {cols.map((col, id) => (
-                      <>
-                        <TableData key={id} row={row} col={col} />
-                      </>
-                    ))}
-                  </tr>
-                </>
+                <tr key={idx} className="text-sm text-[#464F54] ">
+                  {cols.map((col, id) => (
+                    <TableData key={id} row={row} col={col} />
+                  ))}
+                </tr>
               ))
             : null}
         </tbody>

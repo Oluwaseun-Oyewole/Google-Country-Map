@@ -47,7 +47,6 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
         modalRef?.current &&
         !modalRef.current.contains(event.target as Node)
       ) {
-        console.log("Clicked outside the div");
         handleCancel();
       }
     };
@@ -72,7 +71,7 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
           >
             <div
               className="w-[90%] md:w-[500px] bg-dark absolute"
-              ref={modalRef}
+              // ref={modalRef}
             >
               <div>
                 <Button onClick={handleCancel}>Close</Button>

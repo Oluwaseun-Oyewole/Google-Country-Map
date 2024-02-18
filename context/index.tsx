@@ -61,16 +61,34 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
     });
   };
   const [value, setValue] = useState("");
+
   const createCountries = (countryData: CountryEntries) => {
-    return setCountries([
-      ...countries,
-      { country: countryData.country, image: countryData.image },
-    ]);
+    if (countries) {
+      if (
+        !countries.some((country) => country.country === countryData.country)
+      ) {
+        return setCountries([
+          ...countries,
+          { country: countryData.country, image: countryData.image },
+        ]);
+      }
+    }
   };
   const [countryName, setCountryName] = useState("");
   const [tableArray, setTableArray] = useState<any>([]);
+
   const allCountriesArray = (data: any) => {
-    data?.length > 0 && setTableArray((prev: any) => [...prev, ...data]);
+    if (data) {
+      if (
+        !tableArray.some((obj: any) => obj.capital[0] === data[0].capital[0])
+        // obj?.every(
+        //   (val: any, index: number) =>
+        //     obj[index].capital[index] === data[index].capital[index]
+        // )
+      ) {
+        return setTableArray((prev: any) => [...prev, ...data]);
+      }
+    }
   };
 
   return (

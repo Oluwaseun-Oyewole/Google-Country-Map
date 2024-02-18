@@ -4,7 +4,7 @@ import { useCountryData } from "@/context";
 import classNames from "classnames";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, {
+import {
   DetailedHTMLProps,
   InputHTMLAttributes,
   LegacyRef,
@@ -30,7 +30,6 @@ export type InputPropsType = {
   size?: InputSize;
   className?: string;
   value?: string;
-  setQuery: React.Dispatch<React.SetStateAction<string>>;
 } & Omit<
   DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
   "size"
@@ -51,9 +50,8 @@ const Input = (
     size = "small",
     className,
     placeholder,
-    value,
+    // value,
     onChange,
-    setQuery,
     ...props
   }: InputPropsType,
   ref: LegacyRef<HTMLInputElement> | any
@@ -61,18 +59,15 @@ const Input = (
   const [textType, ,] = useState(type);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { setValue } = useCountryData();
+  const { setValue, value } = useCountryData();
 
   const removeParamsFromURL = () => {
     const params = new URLSearchParams(searchParams);
     params.delete("query");
     router.push(`?${params.toString()}`);
     setValue("");
-    setQuery("");
+    ref.current.value = "";
   };
-
-  // console.log("value", value);
-  // console.log("reference", ref?.current?.value);
 
   return (
     <div className="flex relative">
@@ -86,13 +81,13 @@ const Input = (
         type={textType}
         id={id}
         name={name}
-        value={value}
+        // value={value}
         aria-label={label}
         placeholder={placeholder}
         onChange={onChange}
         autoComplete="off"
         className={classNames(
-          `w-full block px-10 outline-none bg-secondary text-[#B8C1D2] text-white rounded-sm font-medium  placeholder:font-medium placeholder:text-sm`,
+          `w-full block px-10 outline-none bg-secondary text-white rounded-sm font-medium  placeholder:font-medium placeholder:text-sm`,
           sizeMap[size],
           className
         )}
