@@ -3,7 +3,7 @@ import Plus from "@/assets/plus.svg";
 import Button from "@/components/button";
 import City from "@/components/city";
 import Spinner from "@/components/loader";
-import MapTest from "@/components/map/mapTest";
+import Map from "@/components/map";
 import Modal, { IModalType } from "@/components/modal";
 import GooglePlaceSearch from "@/components/search";
 import CustomTable from "@/components/table";
@@ -25,7 +25,7 @@ type WeatherResponse = {
 };
 export default function Home() {
   const [countryData, setCountryData] = useState<any>();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const {
     countries,
@@ -78,11 +78,11 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchCountryInfo(country);
+    // fetchCountryInfo(country);
   }, [countryName]);
 
   useEffect(() => {
-    allCountriesArray(countryData);
+    // allCountriesArray(countryData);
   }, [countryData]);
 
   const handleSubmit = () => {
@@ -326,8 +326,8 @@ export default function Home() {
         </Button>
       </Modal>
 
-      <main className="max-w-[92%] pl-0 md:pl-8 md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
-        <div className="lg:h-screen lg:overflow-y-scroll">
+      <main className="max-w-[92%] md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
+        <div className=" pl-0 md:pl-8 lg:h-screen lg:overflow-y-scroll">
           <div className="pt-6 sticky top-0 left-0 bg-dark z-20">
             <div className="w-full md:w-[80%]">
               <GooglePlaceSearch isClassName ref={testRef} />
@@ -361,7 +361,7 @@ export default function Home() {
               </div>
               <div className="pt-4 md:pt-10">
                 <div className="flex justify-between items-center text-sm text-[#ACAFC8] ">
-                  <p className="">{country} Weather Forecast</p>{" "}
+                  <p>{country} Weather Forecast</p>{" "}
                   <p className="text-xs">Forecast for the month</p>
                 </div>
 
@@ -372,7 +372,6 @@ export default function Home() {
                   series={areaSeries}
                   categories={weekDays}
                   curve="smooth"
-                  xaxisLabel={false}
                 /> */}
               </div>
             </div>
@@ -407,11 +406,10 @@ export default function Home() {
           </div>
         </div>
         <div className="w-full sticky top-0 left-0 z-20 flex flex-col justify-between pb-8 h-[100vh] overflow-y-scroll">
-          <div className="h-[55vh]">
-            <MapTest />
+          <div className="h-[60vh]">
+            <Map />
           </div>
-
-          <div className="md:h-[35vh] sticky top-0 left-0 z-10">
+          <div className="md:h-[30vh] sticky top-0 left-0 z-10">
             <CustomTable cols={columns} rows={tableArray} isLoading={loading} />
           </div>
         </div>

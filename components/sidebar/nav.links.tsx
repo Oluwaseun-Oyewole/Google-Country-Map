@@ -6,7 +6,7 @@ import { motion, stagger, useAnimate } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
-import { IRoutesType } from "./routes";
+import { IRoutesType, Routes } from "./routes";
 
 const staggerMenuItems = stagger(0.25, { startDelay: 0.4 });
 function useMenuAnimation() {
@@ -41,7 +41,7 @@ export const NavLink = ({ linkArray }: MenuProps) => {
         <div className="h-[55%] flex items-center flex-col justify-between">
           <ul>
             <motion.li whileHover={{ scale: 1.2 }} className="fade">
-              <Link href="">
+              <Link href={`${Routes.dashboard}`}>
                 <Image src={Logo} alt="icon" className="w-5" />
               </Link>
             </motion.li>

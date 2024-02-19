@@ -1,7 +1,9 @@
 "use client";
+import dynamic from "next/dynamic";
 import { FC } from "react";
-import Chart from "react-apexcharts";
+// import Chart from "react-apexcharts";
 
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 type TCurve =
   | "smooth"
   | "straight"
@@ -38,13 +40,10 @@ export const WeatherChart: FC<Props> = ({
   series,
   className,
   height,
-  xaxisLabel,
-  yAxisLabel,
   showGrid,
   label,
   categories,
   curve,
-  showDownloads,
   stacked,
 }) => {
   const yaxisOptions = {
@@ -199,7 +198,7 @@ export const WeatherChart: FC<Props> = ({
       y: {
         show: true,
         formatter: function (value: number) {
-          return `$${value}`;
+          return `${value}`;
         },
       },
 

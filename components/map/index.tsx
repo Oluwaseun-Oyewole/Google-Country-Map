@@ -1,21 +1,22 @@
 "use client";
 import { useCountryData } from "@/context";
-import { GoogleMap, useJsApiLoader } from "@react-google-maps/api";
-import { useCallback, useEffect, useState } from "react";
+import {
+  GoogleMap,
+  InfoWindow,
+  Marker,
+  MarkerClusterer,
+  useJsApiLoader,
+} from "@react-google-maps/api";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Spinner from "../loader";
 
 const Map = () => {
-  const [center, setCenter] = useState({ lat: 6.537216, lng: 3.3488896 });
-  const [map, setMap] = useState(null);
+  const [map, setMap] = useState<any>(null);
   const { place, coordinate, setCoordinate } = useCountryData();
 
-  // const center = {
-  //   lat: -3.745,
-  //   lng: -38.523,
-  // };
   const containerStyle = {
     width: "100%",
-    height: "450px",
+    height: "470px",
   };
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -23,14 +24,19 @@ const Map = () => {
   });
 
   const onLoad = useCallback(function callback(map: any) {
-    const bounds = new window.google.maps.LatLngBounds(center);
-    map.fitBounds(bounds);
+    const bounds = new window.google.maps.LatLngBounds(coordinate);
+    // map.fitBounds(bounds);
     setMap(map);
   }, []);
 
   const onUnmount = useCallback(function callback(map: any) {
     setMap(null);
   }, []);
+
+  const handleMarkerClick = (lat: number, lng: number) => {
+    map?.setZoom(15);
+    map?.panTo({ lat, lng });
+  };
 
   function handleLocationError(
     browserHasGeolocation: boolean,
@@ -54,9 +60,9 @@ const Map = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-
           const { lat, lng } = pos;
-          setCenter({ lat, lng });
+          // setCoordinate({ lat: 6.5916, lng: 3.2911 });
+          setCoordinate({ lat, lng });
         },
         () => {
           handleLocationError(true, infoWindow);
@@ -67,9 +73,24 @@ const Map = () => {
     }
   }, []);
 
-  // console.log("testing co-ordinates", coordinate);
+  type IPosition = {
+    lat: number;
+    lng: number;
+  };
+  const generatePlaces = (position: IPosition) => {
+    const _places = [];
+    for (let i = 0; i < 7; i++) {
+      const direction = Math.random() < 0.5 ? -2 : 2;
+      _places.push({
+        lat: position.lat + Math.random() / direction,
+        lng: position.lng + Math.random() / direction,
+      });
+    }
+    return _places;
+  };
 
-  // console.log("center", center);
+  const places = useMemo(() => generatePlaces(coordinate), [coordinate]);
+  const [openInfo, setOpenInfo] = useState(false);
 
   return (
     <div>
@@ -77,16 +98,19 @@ const Map = () => {
         <GoogleMap
           mapContainerStyle={containerStyle}
           mapContainerClassName="bg-[##3A3B65]"
-          center={center}
-          zoom={10}
+          center={coordinate}
+          zoom={12}
           onLoad={onLoad}
           onUnmount={onUnmount}
-          onBoundsChanged={() => {}}
+          onZoomChanged={() => {
+            console.log("first map zoom", map?.getZoom());
+          }}
           onCenterChanged={() => {
-            console.log("center change", center);
+            map?.setZoom(10);
           }}
           options={{
             mapTypeControl: false,
+            panControl: true,
             // styles: [
             //   {
             //     featureType: "all",
@@ -105,11 +129,49 @@ const Map = () => {
             // ],
             controlSize: null,
             disableDefaultUI: true,
+            fullscreenControl: true,
+            // streetViewControl: false,
           }}
         >
-          <div className="bg-red-500 h-20 w-20 absolute z-50 translate-y-1/2 translate-x-1/2">
-            <p>{place?.country}</p>
-          </div>
+          <Marker
+            onClick={() => {
+              handleMarkerClick(coordinate.lat, coordinate.lng);
+              setOpenInfo(true);
+            }}
+            position={coordinate}
+            animation={google.maps.Animation.BOUNCE}
+            draggable
+            zIndex={10000}
+            // icon={{
+            //   // url: "",
+            //   scaledSize: new window.google.maps.Size(30, 30),
+            // }}
+          >
+            {openInfo && (
+              <InfoWindow onCloseClick={() => setOpenInfo(false)}>
+                <p className="text-black bg-red-500 h-[50%] w-[50%]">
+                  Weather Info Coming Soon... and it's gonna be nice
+                </p>
+              </InfoWindow>
+            )}
+          </Marker>
+
+          <MarkerClusterer>
+            {(clusterer) => (
+              <div>
+                {places.map((obj: any, i) => (
+                  <Marker
+                    onClick={() =>
+                      handleMarkerClick(coordinate.lat, coordinate.lng)
+                    }
+                    key={i}
+                    position={obj}
+                    animation={google.maps.Animation.DROP}
+                  />
+                ))}
+              </div>
+            )}
+          </MarkerClusterer>
         </GoogleMap>
       ) : (
         <div className="flex items-center justify-center h-[440px]">
