@@ -18,9 +18,11 @@ interface CoordinateType {
   lng: number;
 }
 
-type CountryArrayType = {
+type InfoType = {
+  url: string;
+  website: string;
   name: string;
-}[];
+};
 
 interface WeatherCountryType {
   countryName: string;
@@ -37,6 +39,8 @@ interface WeatherCountryType {
   setValue: React.Dispatch<React.SetStateAction<string>>;
   tableArray: Array<any>;
   allCountriesArray: (data: any) => void;
+  countryInfo: InfoType;
+  setCountryInfo: React.Dispatch<React.SetStateAction<InfoType>>;
 }
 
 const WeatherContext = createContext<WeatherCountryType | undefined>(undefined);
@@ -51,6 +55,13 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [coordinate, setCoordinate] = useState<CoordinateType>({
     lat: 0,
     lng: 0,
+  });
+  const [countryName, setCountryName] = useState("");
+  const [tableArray, setTableArray] = useState<any>([]);
+  const [countryInfo, setCountryInfo] = useState<InfoType>({
+    url: "",
+    website: "",
+    name: "",
   });
   const addPlace = (newPlace: PlaceType) => {
     return setPlace({
@@ -74,8 +85,6 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
       }
     }
   };
-  const [countryName, setCountryName] = useState("");
-  const [tableArray, setTableArray] = useState<any>([]);
 
   const allCountriesArray = (data: any) => {
     if (data) {
@@ -108,6 +117,8 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
         setCountryName,
         tableArray,
         allCountriesArray,
+        countryInfo,
+        setCountryInfo,
       }}
     >
       {children}

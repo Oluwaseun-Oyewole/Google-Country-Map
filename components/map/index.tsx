@@ -1,5 +1,11 @@
 "use client";
 import { useCountryData } from "@/context";
+import { truncate } from "@/helper";
+import {
+  getCurrentWeatherDetails,
+  getHourlyWeatherDetails,
+} from "@/services/weather";
+import { CurrentWeatherDetailsParams } from "@/services/weather/types";
 import {
   GoogleMap,
   InfoWindow,
@@ -12,7 +18,39 @@ import Spinner from "../loader";
 
 const Map = () => {
   const [map, setMap] = useState<any>(null);
-  const { place, coordinate, setCoordinate } = useCountryData();
+  const { place, coordinate, setCoordinate, countryInfo } = useCountryData();
+  const [currentWeatherData, setCurrentWeatherData] = useState<any>();
+  const [, setHourlyWeatherData] = useState<any>();
+  const [, setError] = useState("");
+
+  const fetchCurrentWeatherDetails = async (
+    coordinate: CurrentWeatherDetailsParams
+  ) => {
+    if (!coordinate) return;
+    try {
+      const res = await getCurrentWeatherDetails(coordinate);
+      setCurrentWeatherData(res?.current);
+    } catch (error) {
+      setError("Fetch Error");
+    }
+  };
+
+  const fetchHourlyWeatherDetails = async (
+    coordinate: CurrentWeatherDetailsParams
+  ) => {
+    if (!coordinate) return;
+    try {
+      const res = await getHourlyWeatherDetails(coordinate);
+      setHourlyWeatherData(res?.hourly);
+    } catch (error) {
+      setError("Fetch Error");
+    }
+  };
+
+  useEffect(() => {
+    fetchCurrentWeatherDetails(coordinate);
+    // fetchHourlyWeatherDetails(coordinate);
+  }, [coordinate]);
 
   const containerStyle = {
     width: "100%",
@@ -61,7 +99,6 @@ const Map = () => {
             lng: position.coords.longitude,
           };
           const { lat, lng } = pos;
-          // setCoordinate({ lat: 6.5916, lng: 3.2911 });
           setCoordinate({ lat, lng });
         },
         () => {
@@ -149,9 +186,72 @@ const Map = () => {
           >
             {openInfo && (
               <InfoWindow onCloseClick={() => setOpenInfo(false)}>
-                <p className="text-black bg-red-500 h-[50%] w-[50%]">
-                  Weather Info Coming Soon... and it's gonna be nice
-                </p>
+                <div className="text-black font-poppins text-xs shadow-lg pr-4">
+                  <div className="font-medium py-2">
+                    <p>Current Location : {place?.country}</p>
+                  </div>
+
+                  <div>
+                    <p className="font-medium underline">Location Details : </p>
+
+                    <p className="py-2">
+                      Coordinates:{" "}
+                      {`latitude: ${coordinate?.lat} longitude: ${coordinate?.lng}`}
+                    </p>
+                    <div>
+                      Url :{" "}
+                      <a
+                        href={countryInfo?.url}
+                        target="_blank"
+                        className="text-blue-600"
+                      >
+                        {truncate(countryInfo?.url, 30)}
+                      </a>
+                    </div>
+                    <p className="py-1"> Name : {countryInfo?.name}</p>
+                    <p>
+                      Website:{" "}
+                      <a
+                        href={countryInfo?.website}
+                        className="text-blue-600"
+                        target="_black"
+                      >
+                        {countryInfo?.website}
+                      </a>
+                    </p>
+                  </div>
+
+                  <div className="py-2">
+                    <h2 className="font-medium underline">
+                      Weather Information:
+                    </h2>
+                    {currentWeatherData ? (
+                      <>
+                        <div className="flex items-center gap-4 py-2">
+                          <div>
+                            <p className="pb-1 font-medium">Current</p>
+                            <div>
+                              <p>Summary : {currentWeatherData?.summary}</p>
+                              <p>
+                                temperature : {currentWeatherData?.temperature}
+                              </p>
+                              <p>Pressure : {currentWeatherData?.pressure}</p>
+                              <p>Humidity : {currentWeatherData?.humidity}</p>
+                              <p>Dew-Point : {currentWeatherData?.dew_point}</p>
+                              <p>
+                                Wind-Chill : {currentWeatherData?.wind_chill}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-center pt-2 font-medium">
+                        No Weather Detail
+                      </p>
+                    )}
+                  </div>
+                </div>
               </InfoWindow>
             )}
           </Marker>

@@ -55,6 +55,10 @@ export default function Home() {
   const match = countryName.match(countryRegex);
   const country = match ? match[1] : "";
 
+  // const countryRef  = useRef<any>(null)
+
+  // const [countryParams, setCountryParams] = useState("")
+
   const fetchCountryInfo = async (country: string) => {
     setLoading(true);
     if (!country || (country === "" && !countryName)) {
@@ -62,6 +66,7 @@ export default function Home() {
     } else {
       if (countryCache.current[country]) {
         const data = countryCache.current[country];
+
         setCountryData(data);
       } else {
         try {

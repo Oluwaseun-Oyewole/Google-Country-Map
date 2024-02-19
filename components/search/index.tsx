@@ -16,14 +16,21 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
   const searchParamsQuery = searchParams.get("query");
   let autoCompleteRef = useRef(null);
   const [query, ,] = useState(searchParamsQuery ?? "");
-  const { addPlace, coordinate, setCoordinate, setValue, setCountryName } =
-    useCountryData();
+  const {
+    addPlace,
+    coordinate,
+    setCoordinate,
+    setValue,
+    setCountryName,
+    setCountryInfo,
+  } = useCountryData();
 
   const updateURLFromSearchQuery = (query: any) => {
     const params = new URLSearchParams(searchParams);
     params.set("query", query);
     router.push(`?${params.toString()}`);
   };
+
   const options = {
     fields: [
       "formatted_address",
@@ -31,6 +38,8 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
       "name",
       "address_components",
       "adr_address",
+      "url",
+      "website",
     ],
     strictBounds: false,
   };
@@ -43,6 +52,7 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
 
     autoComplete.addListener("place_changed", () => {
       const place = autoComplete.getPlace();
+      setCountryInfo(place);
       if (!place?.geometry || !place?.geometry.location) {
         window.alert("No details available for input:'" + place?.name + "'");
         return;
@@ -85,6 +95,9 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
         placeholder="Search new place"
         className="pac-input"
       />
+
+      <br />
+      {/* {info && <Image src={`${info.icon}`} alt="" width={50} height={50} />} */}
     </div>
   );
 };
