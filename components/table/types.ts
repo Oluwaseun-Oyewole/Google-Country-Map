@@ -22,4 +22,5 @@ export interface ITable extends ITableBase {
   title?: string;
   rows: any[];
   selected?: boolean;
+  availability?: string;
 }

@@ -2,15 +2,25 @@
 import { useCountryData } from "@/context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { forwardRef, useEffect, useRef, useState } from "react";
+import { Offline, Online } from "react-detect-offline";
 import Input from "../input";
 
 type ISearchPropsType = {
   isClassName?: boolean;
+  textObj: {
+    search: string;
+    mapMessage: string;
+    clearValue: string;
+    alert: string;
+  };
 };
 const GooglePlaceSearch: React.ForwardRefRenderFunction<
   {},
   ISearchPropsType
-> = ({ isClassName }, ref) => {
+> = (
+  { isClassName, textObj: { search, mapMessage, clearValue, alert } },
+  ref
+) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const searchParamsQuery = searchParams.get("query");
@@ -54,7 +64,7 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
       const place = autoComplete.getPlace();
       setCountryInfo(place);
       if (!place?.geometry || !place?.geometry.location) {
-        window.alert("No details available for input:'" + place?.name + "'");
+        window.alert(`${alert}` + place?.name + "");
         return;
       } else {
         setCoordinate({
@@ -85,16 +95,34 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
 
   return (
     <div className={`${isClassName ? "w-full" : "mt-4"} `}>
-      <Input
-        defaultValue={query}
-        type="search"
-        ref={autoCompleteRef}
-        onChange={(event) => {
-          setValue(event?.target?.value);
-        }}
-        placeholder="Search new place"
-        className="pac-input"
-      />
+      <Offline>
+        <div>
+          <p className="pb-4 text-xs">{mapMessage}</p>
+          <Input
+            defaultValue={query}
+            type="search"
+            clearValue={clearValue}
+            onChange={(event) => {
+              setValue(event?.target?.value);
+            }}
+            placeholder={`${search}`}
+            className="pac-input"
+          />
+        </div>
+      </Offline>
+      <Online>
+        <Input
+          defaultValue={query}
+          type="search"
+          ref={autoCompleteRef}
+          clearValue={clearValue}
+          onChange={(event) => {
+            setValue(event?.target?.value);
+          }}
+          placeholder={`${search}`}
+          className="pac-input"
+        />
+      </Online>
 
       <br />
       {/* {info && <Image src={`${info.icon}`} alt="" width={50} height={50} />} */}

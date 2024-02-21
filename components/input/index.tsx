@@ -30,6 +30,7 @@ export type InputPropsType = {
   size?: InputSize;
   className?: string;
   value?: string;
+  clearValue?: string;
 } & Omit<
   DetailedHTMLProps<InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>,
   "size"
@@ -50,6 +51,7 @@ const Input = (
     size = "small",
     className,
     placeholder,
+    clearValue,
     // value,
     onChange,
     ...props
@@ -99,7 +101,7 @@ const Input = (
           className="absolute top-5 right-5 text-xs cursor-pointer text-green-500 font-bold"
           onClick={removeParamsFromURL}
         >
-          clear
+          {clearValue}
         </p>
       )}
     </div>

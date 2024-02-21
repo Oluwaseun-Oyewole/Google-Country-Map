@@ -1,6 +1,8 @@
 import Sidebar from "@/components/sidebar";
+import { dir } from "i18next";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { languages } from "../i18n/settings";
 import { lato, poppins } from "./fonts";
 import "./globals.css";
 import Template from "./template";
@@ -10,13 +12,21 @@ export const metadata: Metadata = {
   description: "Get weather details",
 };
 
+export async function generateStaticParams() {
+  return languages.map((lng) => ({ lng }));
+}
+
 export default function RootLayout({
   children,
+  params: { lng },
 }: Readonly<{
   children: React.ReactNode;
+  params: {
+    lng: string;
+  };
 }>) {
   return (
-    <html lang="en">
+    <html lang={lng} dir={dir(lng)}>
       <Template>
         <body
           className={`${lato.variable} font-lato grid grid-flow-col grid-cols-[max-content_auto] bg-dark overflow-hidden`}

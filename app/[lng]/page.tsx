@@ -15,6 +15,8 @@ import { getWeatherForecasts } from "@/services/weather";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "../i18n/client";
+import { fallbackLng, languages } from "../i18n/settings";
 
 let uploadRQSTController: AbortController | null = null;
 type WeatherResponse = {
@@ -23,18 +25,18 @@ type WeatherResponse = {
   low: string;
   text: string;
 };
-export default function Home() {
+export default function Home({ params: { lng } }: { params: { lng: string } }) {
+  if (languages.indexOf(lng) < 0) lng = fallbackLng;
+  const { t } = useTranslation(lng);
+
   const [countryData, setCountryData] = useState<any>();
   const [loading, setLoading] = useState(false);
 
   const {
-    countries,
     value,
     setValue,
     createCountries,
-    coordinate,
     countryName,
-    place,
     allCountriesArray,
     tableArray,
   } = useCountryData();
@@ -49,16 +51,11 @@ export default function Home() {
     modalRef?.current?.open();
   };
   const [weatherChartData, setWeatherChartData] = useState([]);
-  const testRef = useRef(null);
+  const autoCompleteReference = useRef(null);
   // get country for search autocomplete fields
   const countryRegex = /<span class="country-name">(.*?)<\/span>/;
   const match = countryName.match(countryRegex);
   const country = match ? match[1] : "";
-
-  // const countryRef  = useRef<any>(null)
-
-  // const [countryParams, setCountryParams] = useState("")
-
   const fetchCountryInfo = async (country: string) => {
     setLoading(true);
     if (!country || (country === "" && !countryName)) {
@@ -83,11 +80,11 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // fetchCountryInfo(country);
+    fetchCountryInfo(country);
   }, [countryName]);
 
   useEffect(() => {
-    // allCountriesArray(countryData);
+    allCountriesArray(countryData);
   }, [countryData]);
 
   const handleSubmit = () => {
@@ -125,30 +122,31 @@ export default function Home() {
 
   const columns = [
     {
-      title: "Country",
+      title: `${t("country")}`,
       dataIndex: "name",
       key: "name",
       render: (text: any) => <p className="!text-sm">{text?.common}</p>,
     },
     {
-      title: "Capital",
+      title: `${t("capital")}`,
       dataIndex: "capital",
       key: "capital",
     },
 
     {
-      title: "Capital Coords",
+      title: `${t("capitalCoords")}`,
       dataIndex: "capitalInfo",
       key: "capitalInfo",
       render: (item: any) => (
         <p className="!text-sm">
-          {item && item?.latlng[0]}, {item && item?.latlng[1]}
+          {item && item?.latlng && item?.latlng[0]},{" "}
+          {item && item?.latlng && item?.latlng[1]}
         </p>
       ),
     },
 
     {
-      title: "Currency",
+      title: `${t("currency")}`,
       dataIndex: "currencies",
       key: "currencies",
       render: (value: any) => {
@@ -162,19 +160,19 @@ export default function Home() {
     },
 
     {
-      title: "Continent",
+      title: `${t("continent")}`,
       dataIndex: "continents",
       key: "continents",
     },
 
     {
-      title: "Sub Region",
+      title: `${t("region")}`,
       dataIndex: "subregion",
       key: "subregion",
     },
 
     {
-      title: "Coat",
+      title: `${t("coat")}`,
       dataIndex: "coatOfArms",
       key: "coatOfArms",
       render: (value: any) => (
@@ -182,7 +180,7 @@ export default function Home() {
       ),
     },
     {
-      title: "Flag",
+      title: `${t("flag")}`,
       dataIndex: "flags",
       key: "flags",
       render: (value: any) => (
@@ -190,7 +188,7 @@ export default function Home() {
       ),
     },
     {
-      title: "Maps",
+      title: `${t("maps")}`,
       dataIndex: "maps",
       key: "maps",
       render: (text: any) => (
@@ -205,7 +203,7 @@ export default function Home() {
     },
 
     {
-      title: "Coordinates",
+      title: `${t("coordinate")}`,
       dataIndex: "latlng",
       key: "latlng",
       render: (value: string) => (
@@ -216,7 +214,7 @@ export default function Home() {
     },
 
     {
-      title: "Timezone",
+      title: `${t("timezone")}`,
       dataIndex: "timezones",
       key: "timezones",
       render: (text: string) => {
@@ -224,18 +222,21 @@ export default function Home() {
       },
     },
     {
-      title: "Fifa",
+      title: `${t("Fifa")}`,
       dataIndex: "fifa",
       key: "fifa",
     },
     {
-      title: "Population",
+      title: `${t("population")}`,
       dataIndex: "Population",
       key: "population",
+      // render: (value: number) => {
+      //   return <p>{formatLargeNumber(value)}</p>;
+      // },
     },
 
     {
-      title: "Area",
+      title: `${t("area")}`,
       dataIndex: "area",
       key: "area",
     },
@@ -289,10 +290,25 @@ export default function Home() {
 
   return (
     <>
-      <Modal ref={modal} type="post" />
-      <Modal ref={modalRef}>
+      <Modal
+        ref={modal}
+        type="post"
+        textObj={{ text: t("closeModal"), message: t("placeAdded") }}
+      />
+      <Modal
+        ref={modalRef}
+        textObj={{ text: t("closeModal"), message: t("placeAdded") }}
+      >
         <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
-          <GooglePlaceSearch ref={testRef} />
+          <GooglePlaceSearch
+            ref={autoCompleteReference}
+            textObj={{
+              search: t("searchPlace"),
+              mapMessage: t("mapMessage"),
+              clearValue: t("clear"),
+              alert: t("alert"),
+            }}
+          />
           <div>
             <div
               className="cursor-pointer flex gap-2 justify-between items-center w-full"
@@ -300,13 +316,13 @@ export default function Home() {
                 fileInputRef.current?.click();
               }}
             >
-              <Button>Upload</Button>
+              <Button>{t("upload")}</Button>
               <p
                 className={`text-[12px] w-[20%] flex justify-end ${
                   file?.name ? "text-green-500" : "text-red-500"
                 }`}
               >
-                {file ? truncate(file?.name, 10) : "No File"}
+                {file ? truncate(file?.name, 10) : t("noFile")}
               </p>
             </div>
             <input
@@ -327,16 +343,27 @@ export default function Home() {
           disabled={!value && true}
           onClick={handleSubmit}
         >
-          Submit
+          {t("submit")}
         </Button>
       </Modal>
 
       <main className="max-w-[92%] md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
         <div className=" pl-0 md:pl-8 lg:h-screen lg:overflow-y-scroll">
-          <div className="pt-6 sticky top-0 left-0 bg-dark z-20">
+          <div className="pt-6 sticky top-0 left-0 bg-dark z-20 flex items-start gap-5">
             <div className="w-full md:w-[80%]">
-              <GooglePlaceSearch isClassName ref={testRef} />
+              <GooglePlaceSearch
+                isClassName
+                ref={autoCompleteReference}
+                textObj={{
+                  search: t("searchPlace"),
+                  mapMessage: t("mapMessage"),
+                  clearValue: t("clear"),
+                  alert: t("alert"),
+                }}
+              />
             </div>
+
+            <div>Country select</div>
           </div>
           <div className="relative pt-8 md:pt-14">
             <div className="w-full grid grid-flow-col grid-cols-[50%_45%] gap-2 md:grid-cols-[70%_25%] justify-between items-center">
@@ -346,7 +373,7 @@ export default function Home() {
                 onClick={handleOpenModal}
               >
                 <Image src={Plus} alt="add city" />
-                <p>Add City</p>
+                <p>{t("addCity")}</p>
               </div>
             </div>
 
@@ -366,8 +393,10 @@ export default function Home() {
               </div>
               <div className="pt-4 md:pt-10">
                 <div className="flex justify-between items-center text-sm text-[#ACAFC8] ">
-                  <p>{country} Weather Forecast</p>{" "}
-                  <p className="text-xs">Forecast for the month</p>
+                  <p>
+                    {country} {t("weatherForecast")}
+                  </p>{" "}
+                  <p className="text-xs">{t("monthlyForecast")}</p>
                 </div>
 
                 {/* <WeatherChart
@@ -389,7 +418,7 @@ export default function Home() {
               ) : (
                 <>
                   {weatherChartData.length === 0 ? (
-                    <p className="text-sm ">Weather forecast unavailable</p>
+                    <p className="text-sm ">{t("weatherStatus")}</p>
                   ) : (
                     weatherChartData?.map(
                       (weather: WeatherResponse, index: number) => {
@@ -410,12 +439,34 @@ export default function Home() {
             </div>
           </div>
         </div>
+
         <div className="w-full sticky top-0 left-0 z-20 flex flex-col justify-between pb-8 h-[100vh] overflow-y-scroll">
           <div className="h-[60vh]">
-            <Map />
+            <Map
+              coordinates={t("coordinates")}
+              currentLocation={t("currentLocation")}
+              locationDetails={t("locationDetails")}
+              url={t("url")}
+              website={t("website")}
+              weatherInfo={t("weatherInfo")}
+              summary={t("summary")}
+              temperature={t("temperature")}
+              pressure={t("pressure")}
+              humidity={t("humidity")}
+              dewPoint={t("dewPoint")}
+              windChill={t("windChill")}
+              mapOfflineMessage={t("mapOfflineMessage")}
+              name={t("name")}
+              noWeather={t("noWeather")}
+            />
           </div>
           <div className="md:h-[30vh] sticky top-0 left-0 z-10">
-            <CustomTable cols={columns} rows={tableArray} isLoading={loading} />
+            <CustomTable
+              cols={columns}
+              rows={tableArray}
+              isLoading={loading}
+              availability={t("availability")}
+            />
           </div>
         </div>
       </main>

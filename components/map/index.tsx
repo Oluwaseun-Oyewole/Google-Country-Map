@@ -14,9 +14,43 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Offline, Online } from "react-detect-offline";
 import Spinner from "../loader";
 
-const Map = () => {
+type IMap = {
+  currentLocation: string;
+  locationDetails: string;
+  coordinates: string;
+  url: string;
+  website: string;
+  weatherInfo: string;
+  summary: string;
+  temperature: string;
+  pressure: string;
+  humidity: string;
+  dewPoint: string;
+  windChill: string;
+  name: string;
+  mapOfflineMessage: string;
+  noWeather: string;
+};
+const Map = ({
+  coordinates,
+  currentLocation,
+  locationDetails,
+  url,
+  website,
+  weatherInfo,
+  summary,
+  temperature,
+  pressure,
+  humidity,
+  dewPoint,
+  windChill,
+  mapOfflineMessage,
+  name,
+  noWeather,
+}: IMap) => {
   const [map, setMap] = useState<any>(null);
   const { place, coordinate, setCoordinate, countryInfo } = useCountryData();
   const [currentWeatherData, setCurrentWeatherData] = useState<any>();
@@ -130,155 +164,177 @@ const Map = () => {
   const [openInfo, setOpenInfo] = useState(false);
 
   return (
-    <div>
-      {isLoaded ? (
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          mapContainerClassName="bg-[##3A3B65]"
-          center={coordinate}
-          zoom={12}
-          onLoad={onLoad}
-          onUnmount={onUnmount}
-          onZoomChanged={() => {
-            console.log("first map zoom", map?.getZoom());
-          }}
-          onCenterChanged={() => {
-            map?.setZoom(10);
-          }}
-          options={{
-            mapTypeControl: false,
-            panControl: true,
-            // styles: [
-            //   {
-            //     featureType: "all",
-            //     stylers: [{ color: "#262742" }],
-            //   },
-            //   {
-            //     featureType: "road.arterial",
-            //     elementType: "geometry",
-            //     stylers: [{ color: "#4E4DB0" }],
-            //   },
-            //   {
-            //     featureType: "landscape",
-            //     elementType: "labels",
-            //     stylers: [{ color: "#380ABB" }],
-            //   },
-            // ],
-            controlSize: null,
-            disableDefaultUI: true,
-            fullscreenControl: true,
-            // streetViewControl: false,
-          }}
-        >
-          <Marker
-            onClick={() => {
-              handleMarkerClick(coordinate.lat, coordinate.lng);
-              setOpenInfo(true);
-            }}
-            position={coordinate}
-            animation={google.maps.Animation.BOUNCE}
-            draggable
-            zIndex={10000}
-            // icon={{
-            //   // url: "",
-            //   scaledSize: new window.google.maps.Size(30, 30),
-            // }}
-          >
-            {openInfo && (
-              <InfoWindow onCloseClick={() => setOpenInfo(false)}>
-                <div className="text-black font-poppins text-xs shadow-lg pr-4">
-                  <div className="font-medium py-2">
-                    <p>Current Location : {place?.country}</p>
-                  </div>
+    <>
+      <Online>
+        <div>
+          {isLoaded ? (
+            <GoogleMap
+              mapContainerStyle={containerStyle}
+              mapContainerClassName="bg-[##3A3B65]"
+              center={coordinate}
+              zoom={12}
+              onLoad={onLoad}
+              onUnmount={onUnmount}
+              onZoomChanged={() => {}}
+              onCenterChanged={() => {
+                map?.setZoom(10);
+              }}
+              options={{
+                mapTypeControl: false,
+                panControl: true,
+                // styles: [
+                //   {
+                //     featureType: "all",
+                //     stylers: [{ color: "#262742" }],
+                //   },
+                //   {
+                //     featureType: "road.arterial",
+                //     elementType: "geometry",
+                //     stylers: [{ color: "#4E4DB0" }],
+                //   },
+                //   {
+                //     featureType: "landscape",
+                //     elementType: "labels",
+                //     stylers: [{ color: "#380ABB" }],
+                //   },
+                // ],
+                controlSize: null,
+                disableDefaultUI: true,
+                fullscreenControl: true,
+                // streetViewControl: false,
+              }}
+            >
+              <Marker
+                onClick={() => {
+                  handleMarkerClick(coordinate.lat, coordinate.lng);
+                  setOpenInfo(true);
+                }}
+                position={coordinate}
+                animation={google.maps.Animation.BOUNCE}
+                draggable
+                zIndex={10000}
+                // icon={{
+                //   // url: "",
+                //   scaledSize: new window.google.maps.Size(30, 30),
+                // }}
+              >
+                {openInfo && (
+                  <InfoWindow onCloseClick={() => setOpenInfo(false)}>
+                    <div className="text-black font-poppins text-xs shadow-lg pr-4">
+                      <div className="font-medium py-2">
+                        <p>
+                          {currentLocation} : {place?.country}
+                        </p>
+                      </div>
 
-                  <div>
-                    <p className="font-medium underline">Location Details : </p>
+                      <div>
+                        <p className="font-medium underline">
+                          {locationDetails} :
+                        </p>
 
-                    <p className="py-2">
-                      Coordinates:{" "}
-                      {`latitude: ${coordinate?.lat} longitude: ${coordinate?.lng}`}
-                    </p>
-                    <div>
-                      Url :{" "}
-                      <a
-                        href={countryInfo?.url}
-                        target="_blank"
-                        className="text-blue-600"
-                      >
-                        {truncate(countryInfo?.url, 30)}
-                      </a>
-                    </div>
-                    <p className="py-1"> Name : {countryInfo?.name}</p>
-                    <p>
-                      Website:{" "}
-                      <a
-                        href={countryInfo?.website}
-                        className="text-blue-600"
-                        target="_black"
-                      >
-                        {countryInfo?.website}
-                      </a>
-                    </p>
-                  </div>
-
-                  <div className="py-2">
-                    <h2 className="font-medium underline">
-                      Weather Information:
-                    </h2>
-                    {currentWeatherData ? (
-                      <>
-                        <div className="flex items-center gap-4 py-2">
-                          <div>
-                            <p className="pb-1 font-medium">Current</p>
-                            <div>
-                              <p>Summary : {currentWeatherData?.summary}</p>
-                              <p>
-                                temperature : {currentWeatherData?.temperature}
-                              </p>
-                              <p>Pressure : {currentWeatherData?.pressure}</p>
-                              <p>Humidity : {currentWeatherData?.humidity}</p>
-                              <p>Dew-Point : {currentWeatherData?.dew_point}</p>
-                              <p>
-                                Wind-Chill : {currentWeatherData?.wind_chill}
-                              </p>
-                            </div>
-                          </div>
+                        <p className="py-2">
+                          {coordinates}:
+                          {`latitude: ${coordinate?.lat} longitude: ${coordinate?.lng}`}
+                        </p>
+                        <div>
+                          {url} :
+                          <a
+                            href={countryInfo?.url}
+                            target="_blank"
+                            className="text-blue-600"
+                          >
+                            {truncate(countryInfo?.url, 30)}
+                          </a>
                         </div>
-                      </>
-                    ) : (
-                      <p className="text-center pt-2 font-medium">
-                        No Weather Detail
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </InfoWindow>
-            )}
-          </Marker>
+                        <p className="py-1">
+                          {" "}
+                          {name} : {countryInfo?.name}
+                        </p>
+                        <p>
+                          {website}:
+                          <a
+                            href={countryInfo?.website}
+                            className="text-blue-600"
+                            target="_black"
+                          >
+                            {countryInfo?.website}
+                          </a>
+                        </p>
+                      </div>
 
-          <MarkerClusterer>
-            {(clusterer) => (
-              <div>
-                {places.map((obj: any, i) => (
-                  <Marker
-                    onClick={() =>
-                      handleMarkerClick(coordinate.lat, coordinate.lng)
-                    }
-                    key={i}
-                    position={obj}
-                    animation={google.maps.Animation.DROP}
-                  />
-                ))}
-              </div>
-            )}
-          </MarkerClusterer>
-        </GoogleMap>
-      ) : (
-        <div className="flex items-center justify-center h-[440px]">
-          <Spinner />
+                      <div className="py-2">
+                        <h2 className="font-medium underline">
+                          {weatherInfo}:
+                        </h2>
+                        {currentWeatherData ? (
+                          <>
+                            <div className="flex items-center gap-4 py-2">
+                              <div>
+                                <div>
+                                  <p>
+                                    {summary} : {currentWeatherData?.summary}
+                                  </p>
+                                  <p>
+                                    {temperature} :
+                                    {currentWeatherData?.temperature}
+                                  </p>
+                                  <p>
+                                    {pressure} : {currentWeatherData?.pressure}
+                                  </p>
+                                  <p>
+                                    {humidity} : {currentWeatherData?.humidity}
+                                  </p>
+                                  <p>
+                                    {dewPoint} : {currentWeatherData?.dew_point}
+                                  </p>
+                                  <p>
+                                    {windChill} :
+                                    {currentWeatherData?.wind_chill}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <p className="text-center pt-2 font-medium">
+                            {noWeather}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </InfoWindow>
+                )}
+              </Marker>
+              <MarkerClusterer>
+                {(clusterer) => (
+                  <div>
+                    {places.map((obj: any, i) => (
+                      <Marker
+                        onClick={() =>
+                          handleMarkerClick(coordinate.lat, coordinate.lng)
+                        }
+                        key={i}
+                        position={obj}
+                        animation={google.maps.Animation.DROP}
+                      />
+                    ))}
+                  </div>
+                )}
+              </MarkerClusterer>
+            </GoogleMap>
+          ) : (
+            <div className="flex items-center justify-center h-[440px]">
+              <Spinner />
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </Online>
+      <Offline>
+        <div className="text-xs flex items-center justify-center h-[500px]">
+          {mapOfflineMessage}
+        </div>
+      </Offline>
+    </>
   );
 };
 

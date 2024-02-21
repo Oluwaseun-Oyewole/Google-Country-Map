@@ -17,9 +17,12 @@ export type IModalType = {
 };
 
 type IModal = "post" | "default";
-type Props = { type?: IModal } & PropsWithChildren;
+type Props = {
+  type?: IModal;
+  textObj: { text: string; message: string };
+} & PropsWithChildren;
 const Modal: ForwardRefRenderFunction<IModalType, Props> = (
-  { children, type = "default" },
+  { children, type = "default", textObj: { text, message } },
   ref
 ) => {
   const [open, setOpen] = useState(false);
@@ -74,7 +77,7 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
               // ref={modalRef}
             >
               <div>
-                <Button onClick={handleCancel}>Close</Button>
+                <Button onClick={handleCancel}>{text}</Button>
               </div>
               {children}
             </div>
@@ -91,12 +94,12 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
                 duration: 1.5,
               }}
             >
-              <p className="text-sm">Place Added</p>
+              <p className="text-sm">{message}</p>
               <p
                 className="cursor-pointer text-green-500"
                 onClick={handleCancel}
               >
-                close
+                {text}
               </p>
             </motion.div>
           </div>

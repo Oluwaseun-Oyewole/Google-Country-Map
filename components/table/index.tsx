@@ -3,7 +3,13 @@ import Spinner from "../loader";
 import TableData from "./table.data";
 import { ITable } from "./types";
 
-function CustomTable({ cols, rows, isLoading, emptyTableStyle }: ITable) {
+function CustomTable({
+  cols,
+  rows,
+  isLoading,
+  emptyTableStyle,
+  availability,
+}: ITable) {
   return (
     <div className="lg:w-full h-[300px] overflow-x-scroll">
       <table
@@ -43,7 +49,7 @@ function CustomTable({ cols, rows, isLoading, emptyTableStyle }: ITable) {
               <td colSpan={9999} className={emptyTableStyle}>
                 {!isLoading && (
                   <div className="grid justify-items-center py-5 text-sm">
-                    <p>No Country data Available</p>
+                    <p>{availability}</p>
                   </div>
                 )}
               </td>
