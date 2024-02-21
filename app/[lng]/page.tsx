@@ -292,6 +292,8 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     },
   ];
 
+  console.log("area series", areaSeries[0]?.data?.length);
+
   return (
     <>
       <Modal
@@ -407,7 +409,10 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                 </div>
 
                 <div className="flex items-end justify-end py-3">
-                  <Button className="w-[180px] !bg-primary text-xs">
+                  <Button
+                    className="!w-[180px] !bg-primary text-xs"
+                    disabled={!areaSeries[0]?.data?.length}
+                  >
                     <CSVLink data={areaSeries}>Download Data</CSVLink>
                   </Button>
                 </div>

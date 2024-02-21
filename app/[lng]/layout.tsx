@@ -40,7 +40,7 @@ export default function RootLayout({
 
           <Script
             type="application/javascript"
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBd0vAku9eywLaQkzxlE0iwFb8aSu9OEyI&libraries=places"
+            src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}&libraries=places`}
             strategy="beforeInteractive"
           />
         </body>

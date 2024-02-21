@@ -92,7 +92,7 @@ const Map = ({
   };
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "YOUR_API_KEY",
+    googleMapsApiKey: `${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}`,
   });
 
   const onLoad = useCallback(function callback(map: any) {
