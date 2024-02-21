@@ -1,6 +1,7 @@
 "use client";
 import Plus from "@/assets/plus.svg";
 import Button from "@/components/button";
+import { WeatherChart } from "@/components/chart";
 import City from "@/components/city";
 import Spinner from "@/components/loader";
 import Map from "@/components/map";
@@ -15,11 +16,12 @@ import { getWeatherForecasts } from "@/services/weather";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { CSVLink } from "react-csv";
 import { useTranslation } from "../i18n/client";
 import { fallbackLng, languages } from "../i18n/settings";
 import { LanguageSwitcher } from "./components/switcher";
 
-let uploadRQSTController: AbortController | null = null;
+// let uploadRQSTController: AbortController | null = null;
 type WeatherResponse = {
   day: string;
   high: string;
@@ -351,7 +353,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
 
       <main className="max-w-[92%] md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
         <div className=" pl-0 md:pl-8 lg:h-screen lg:overflow-y-scroll">
-          <div className="pt-6 sticky top-0 left-0 bg-dark z-20 flex items-start gap-5">
+          <div className="pt-6 sticky top-0 left-0 bg-dark z-20 flex items-center gap-5">
             <div className="w-full md:w-[80%]">
               <GooglePlaceSearch
                 isClassName
@@ -366,10 +368,10 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
             </div>
 
             <div>
-              <LanguageSwitcher i18n={i18n} lng={lng} path={""} />
+              <LanguageSwitcher i18n={i18n} lng={lng} path="" />
             </div>
           </div>
-          <div className="relative pt-8 md:pt-14">
+          <div className="relative pt-8 md:pt-10">
             <div className="w-full grid grid-flow-col grid-cols-[50%_45%] gap-2 md:grid-cols-[70%_25%] justify-between items-center">
               <City />
               <div
@@ -395,22 +397,41 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                   );
                 })}
               </div>
-              <div className="pt-4 md:pt-10">
-                <div className="flex justify-between items-center text-sm text-[#ACAFC8] ">
+              <div className="pt-8 md:pt-16">
+                <div className="flex justify-between items-center text-sm text-[#ACAFC8] pb-4">
                   <p>
                     {country} {t("weatherForecast")}
-                  </p>{" "}
+                  </p>
                   <p className="text-xs">{t("monthlyForecast")}</p>
                 </div>
 
-                {/* <WeatherChart
-                  id="area-chart"
-                  type="line"
-                  colors={["#B619A6", "#380ABB"]}
-                  series={areaSeries}
-                  categories={weekDays}
-                  curve="smooth"
-                /> */}
+                <div className="flex items-end justify-end py-3">
+                  <Button className="w-[180px] !bg-primary text-xs">
+                    <CSVLink data={areaSeries}>Download Data</CSVLink>
+                  </Button>
+                </div>
+
+                {areaSeries ? (
+                  <WeatherChart
+                    id="area-chart"
+                    type="line"
+                    colors={["#B619A6", "#380ABB"]}
+                    series={areaSeries}
+                    categories={weekDays}
+                    curve="smooth"
+                    width={"100%"}
+                  />
+                ) : (
+                  <WeatherChart
+                    id="area-chart"
+                    type="line"
+                    colors={["#B619A6", "#380ABB"]}
+                    series={[]}
+                    categories={[]}
+                    curve="smooth"
+                    width={"100%"}
+                  />
+                )}
               </div>
             </div>
 

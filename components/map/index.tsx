@@ -185,8 +185,18 @@ const Map = ({
                 // styles: [
                 //   {
                 //     featureType: "all",
-                //     stylers: [{ color: "#262742" }],
+                //     stylers: [{ color: "#333" }],
                 //   },
+                //   {
+                //     featureType: "road",
+                //     stylers: [{ color: "#000" }],
+                //   },
+
+                //   {
+                //     featureType: "water",
+                //     stylers: [{ color: "#fff" }],
+                //   },
+
                 //   {
                 //     featureType: "road.arterial",
                 //     elementType: "geometry",

@@ -221,6 +221,7 @@ export const WeatherChart: FC<Props> = ({
       type={type}
       height={height ?? 300}
       className={className}
+      width={"100%"}
     />
   );
 };

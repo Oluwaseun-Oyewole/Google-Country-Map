@@ -24,13 +24,13 @@ export const LanguageSwitcher = ({
               <Link href={`/${l}${path}`}>
                 {l === "en" ? (
                   <div className="flex gap-2 text-sm items-center">
-                    <Image src={English} alt="flag" className="" />
-                    <p>English</p>
+                    <Image src={English} alt="flag" className="w-[50px]" />
+                    <p className="hidden md:block">English</p>
                   </div>
                 ) : (
                   <div className="flex gap-2 text-sm items-center">
                     <Image src={Dutch} alt="flag" className="w-[50px]" />
-                    <p>Deutsh</p>
+                    <p className="hidden md:block">Deutsh</p>
                   </div>
                 )}
               </Link>
