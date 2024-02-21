@@ -15,7 +15,7 @@ import { Endpoints } from "@/services/endpoints";
 import { getWeatherForecasts } from "@/services/weather";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { CSVLink } from "react-csv";
 import { useTranslation } from "../i18n/client";
 import { fallbackLng, languages } from "../i18n/settings";
@@ -267,7 +267,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     setLoading(false);
   };
   useEffect(() => {
-    // fetchChartWeatherForecast(country);
+    fetchChartWeatherForecast(country);
   }, [country]);
 
   const weekDays = weatherChartData?.map(
@@ -293,7 +293,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   ];
 
   return (
-    <>
+    <Suspense fallback={<Spinner />}>
       <Modal
         ref={modal}
         type="post"
@@ -499,6 +499,6 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
           </div>
         </div>
       </main>
-    </>
+    </Suspense>
   );
 }

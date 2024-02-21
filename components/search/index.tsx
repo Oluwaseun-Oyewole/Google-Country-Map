@@ -64,7 +64,7 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
       const place = autoComplete.getPlace();
       setCountryInfo(place);
       if (!place?.geometry || !place?.geometry.location) {
-        window.alert(`${alert}` + place?.name + "");
+        window.alert(alert + place?.name + "");
         return;
       } else {
         setCoordinate({
