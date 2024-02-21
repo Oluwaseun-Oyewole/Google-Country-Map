@@ -305,6 +305,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
       >
         <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
           <GooglePlaceSearch
+            isClassName={false}
             ref={autoCompleteReference}
             textObj={{
               search: t("searchPlace"),
