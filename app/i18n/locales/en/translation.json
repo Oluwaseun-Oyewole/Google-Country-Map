@@ -1,7 +1,7 @@
 {
   "searchPlace": "Search new place",
   "mapMessage": "Can't load autocomplete in offline mode",
-  "'availability": "No Country Available",
+  "availability": "No Country Available",
   "alert": "No details available for input : ",
   "currentLocation": "current Location",
   "locationDetails": "Location Details",

@@ -17,6 +17,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "../i18n/client";
 import { fallbackLng, languages } from "../i18n/settings";
+import { LanguageSwitcher } from "./components/switcher";
 
 let uploadRQSTController: AbortController | null = null;
 type WeatherResponse = {
@@ -28,6 +29,7 @@ type WeatherResponse = {
 export default function Home({ params: { lng } }: { params: { lng: string } }) {
   if (languages.indexOf(lng) < 0) lng = fallbackLng;
   const { t } = useTranslation(lng);
+  const { i18n } = useTranslation(lng, "footer");
 
   const [countryData, setCountryData] = useState<any>();
   const [loading, setLoading] = useState(false);
@@ -363,7 +365,9 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
               />
             </div>
 
-            <div>Country select</div>
+            <div>
+              <LanguageSwitcher i18n={i18n} lng={lng} path={""} />
+            </div>
           </div>
           <div className="relative pt-8 md:pt-14">
             <div className="w-full grid grid-flow-col grid-cols-[50%_45%] gap-2 md:grid-cols-[70%_25%] justify-between items-center">
