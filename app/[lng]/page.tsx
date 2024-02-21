@@ -292,8 +292,6 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     },
   ];
 
-  console.log("area series", areaSeries[0]?.data?.length);
-
   return (
     <>
       <Modal
