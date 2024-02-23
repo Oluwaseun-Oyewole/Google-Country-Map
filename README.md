@@ -1,10 +1,10 @@
-### Google Weather Map
+#### Google Weather Map
 
 #### Project Overview
 
-    :Google Weather Map shows the weather condition of a place, shows the place on the map with markers with an InfoWindow, renders weather and country info on custom tables.
+    Google Weather Map shows the weather condition of a place, shows the details on the map with markers, renders weather and country info on custom tables, select between languages, filter weather forecast.
 
-### Features:
+#### Features:
 
 ```bash
 Google Maps
@@ -18,11 +18,11 @@ Autocomplete Modal
 Weather Forecast Chart
 ```
 
-### Technologies
+#### Technologies
 
 ```bash
-React JS
-Next JS
+React
+Next
 Google
 Tailwind
 Typescript
