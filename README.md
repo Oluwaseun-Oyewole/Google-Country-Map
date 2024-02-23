@@ -1,6 +1,10 @@
-## Google Weather Map:
+### Google Weather Map
 
-## Features:
+#### Project Overview
+
+    :Google Weather Map shows the weather condition of a place, shows the place on the map with markers with an InfoWindow, renders weather and country info on custom tables.
+
+### Features:
 
 ```bash
 Google Maps
@@ -10,20 +14,21 @@ Internationalization
 Dynamic Custom Table
 Charts
 Chart Filter
+Autocomplete Modal
+Weather Forecast Chart
 ```
 
-## Technologies
+### Technologies
 
 ```bash
 React JS
 Next JS
 Google
+Tailwind
 Typescript
 ```
 
-### Link
-
-[title](https://google-country-weather-map.vercel.app/en)
+[Google-Weather-Map](https://google-country-weather-map.vercel.app/en)
 
 ![screenshot](<assets/Screenshot 2024-02-23 at 13.29.01.png>)
 ![screenshot](<assets/Screenshot 2024-02-23 at 13.28.17.png>)
