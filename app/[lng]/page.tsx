@@ -12,27 +12,37 @@ import { useCountryData } from "@/context";
 import selectRandomImage, { imageUrls, items, truncate } from "@/helper";
 import Request from "@/services";
 import { Endpoints } from "@/services/endpoints";
-import { getWeatherForecasts } from "@/services/weather";
+import {
+  FilterWeatherInformation,
+  getWeatherForecasts,
+  weatherInformation,
+} from "@/services/weather";
+import { format } from "date-fns";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { CSVLink } from "react-csv";
+import { DateRangePicker } from "react-date-range";
+import "react-date-range/dist/styles.css"; // main css file
+import "react-date-range/dist/theme/default.css"; // theme css file
 import { useTranslation } from "../i18n/client";
 import { fallbackLng, languages } from "../i18n/settings";
 import { LanguageSwitcher } from "./components/switcher";
 
 // let uploadRQSTController: AbortController | null = null;
 type WeatherResponse = {
-  day: string;
-  high: string;
-  low: string;
-  text: string;
+  temp: string;
+  humidity: string;
+  windspeed: string;
+  datetime: string;
 };
 export default function Home({ params: { lng } }: { params: { lng: string } }) {
   if (languages.indexOf(lng) < 0) lng = fallbackLng;
   const { t } = useTranslation(lng);
-  const { i18n } = useTranslation(lng, "footer");
+  const { i18n } = useTranslation(lng);
 
+  const [weatherForecastArray, setWeatherForecastArray] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
   const [countryData, setCountryData] = useState<any>();
   const [loading, setLoading] = useState(false);
 
@@ -43,7 +53,16 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     countryName,
     allCountriesArray,
     tableArray,
+    coordinate,
+    weatherData,
+    setWeatherData,
   } = useCountryData();
+  type IFilterProps = { startDate: string; endDate: string };
+  type IStateType = {
+    startDate: Date;
+    endDate: Date;
+    key: string;
+  };
 
   const cache = useRef<any>({});
   const countryCache = useRef<any>({});
@@ -82,14 +101,60 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     }
     setLoading(false);
   };
+  const fetchChartWeatherForecast = async (location: string) => {
+    setLoading(true);
+    if (!location || location === "") {
+      setLoading(false);
+    } else {
+      if (cache.current[location]) {
+        const data = cache.current[location];
+        setWeatherChartData(data);
+      } else {
+        const res = await getWeatherForecasts({ location: location });
+        if (res) {
+          cache.current[location] = res?.forecasts;
+          setWeatherChartData(res?.forecasts);
+        } else {
+          setWeatherChartData([]);
+        }
+      }
+    }
+    setLoading(false);
+  };
+  const fetchWeatherInfo = async () => {
+    setLoading(true);
+    const res = await weatherInformation(
+      `${coordinate.lat},${coordinate.lng}/today`,
+      {
+        key: `${process.env.NEXT_PUBLIC_WEATHER_VISUAL_API_KEY}`,
+      }
+    );
+    if (res) {
+      setWeatherData(res?.days);
+    }
+    setLoading(false);
+  };
+  const filterWeatherInformation = async ({
+    startDate,
+    endDate,
+  }: IFilterProps) => {
+    setLoading(true);
+    const res = await FilterWeatherInformation(
+      `${coordinate.lat},${coordinate.lng}/${startDate}/${endDate}`
+    );
+    if (res) {
+      setWeatherForecastArray(res?.days);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     fetchCountryInfo(country);
-  }, [countryName]);
+  }, [countryName, coordinate]);
 
   useEffect(() => {
     allCountriesArray(countryData);
-  }, [countryData]);
+  }, [countryName]);
 
   const handleSubmit = () => {
     if (!value) return;
@@ -246,49 +311,145 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     },
   ];
 
-  const fetchChartWeatherForecast = async (location: string) => {
-    setLoading(true);
-    if (!location || location === "") {
-      setLoading(false);
-    } else {
-      if (cache.current[location]) {
-        const data = cache.current[location];
-        setWeatherChartData(data);
-      } else {
-        const res = await getWeatherForecasts({ location: location });
-        if (res) {
-          cache.current[location] = res?.forecasts;
-          setWeatherChartData(res?.forecasts);
-        } else {
-          setWeatherChartData([]);
-        }
-      }
-    }
-    setLoading(false);
-  };
   useEffect(() => {
-    fetchChartWeatherForecast(country);
+    // fetchChartWeatherForecast(country);
   }, [country]);
 
-  const weekDays = weatherChartData?.map(
-    (weather: WeatherResponse) => weather?.day
+  const [state, setState] = useState<IStateType[]>([
+    {
+      startDate: new Date(),
+      endDate: new Date(),
+      key: "selection",
+    },
+  ]);
+
+  let tempArray: any = [];
+  // const temps = weatherData?.map((weather: any) =>
+  //   weather.hours?.map((data: WeatherResponse) => temptArray.push(data.temp))
+  // );
+
+  const temps = weatherData?.map((weather: WeatherResponse) =>
+    tempArray.push(weather.temp)
   );
-  const highWeekDay = weatherChartData?.map(
-    (weather: WeatherResponse) => weather?.high
+
+  // const chartDates = weatherData?.map(
+  //   (weather: WeatherResponse) => weather.datetime
+  // );
+  let dateArray: any = [];
+  const chartDates = weatherData?.map((weather: WeatherResponse) =>
+    dateArray.push(weather.datetime)
   );
-  const lowWeekDay = weatherChartData?.map(
-    (weather: WeatherResponse) => weather?.low
+
+  // const chartDates = weatherData?.map((weather: any) =>
+  //   weather.hours?.map((data: WeatherResponse) => dateArray.push(data.datetime))
+  // );
+
+  let humidityArray: any = [];
+  const humidity = weatherForecastArray?.map((weather: WeatherResponse) =>
+    humidityArray.push(weather.humidity)
   );
+
+  // const humidity = weatherData?.map((weather: any) =>
+  //   weather.hours?.map((data: WeatherResponse) =>
+  //     humidityArray.push(data.humidity)
+  //   )
+  // );
+
+  let windArray: any = [];
+  const wind = weatherForecastArray?.map((weather: WeatherResponse) =>
+    windArray.push(weather.windspeed)
+  );
+
+  console.log("wind", tempArray);
+  // const wind = weatherData?.map((weather: any) =>
+  //   weather.hours?.map((data: WeatherResponse) =>
+  //     windArray.push(data.windspeed)
+  //   )
+  // );
 
   const areaSeries = [
     {
-      name: "High",
-      data: highWeekDay,
+      name: "Temperature",
+      data: tempArray,
     },
 
     {
-      name: "Low",
-      data: lowWeekDay,
+      name: "Humidity",
+      data: humidityArray,
+    },
+    {
+      name: "Wind Speed",
+      data: windArray,
+    },
+  ];
+
+  useEffect(() => {
+    fetchWeatherInfo();
+  }, [coordinate]);
+
+  const weatherColumns = [
+    {
+      title: `${t("dateTime")}`,
+      dataIndex: "datetime",
+      key: "datetime",
+    },
+    {
+      title: `${t("cloudCover")}`,
+      dataIndex: "cloudcover",
+      key: "cloudcover",
+    },
+    {
+      title: `${t("condition")}`,
+      dataIndex: "conditions",
+      key: "conditions",
+    },
+
+    {
+      title: `${t("humidity")}`,
+      dataIndex: "humidity",
+      key: "humidity",
+    },
+
+    {
+      title: `${t("pressure")}`,
+      dataIndex: "pressure",
+      key: "pressure",
+    },
+
+    {
+      title: `${t("snow")}`,
+      dataIndex: "snow",
+      key: "snow",
+    },
+
+    {
+      title: `${t("sunrise")}`,
+      dataIndex: "sunrise",
+      key: "sunrise",
+    },
+
+    {
+      title: `${t("dew")}`,
+      dataIndex: "dew",
+      key: "dew",
+    },
+
+    {
+      title: `${t("temperature")}`,
+      dataIndex: "temp",
+      key: "temp",
+    },
+
+    {
+      title: `${t("windSpeed")}`,
+      dataIndex: "windspeed",
+      key: "windspeed",
+    },
+
+    {
+      title: `${t("describe")}`,
+      dataIndex: "description",
+      key: "description",
     },
   ];
 
@@ -406,22 +567,51 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                   <p className="text-xs">{t("monthlyForecast")}</p>
                 </div>
 
+                <div className="sticky top-0 left-0 z-10 my-10">
+                  <CustomTable
+                    cols={weatherColumns}
+                    rows={weatherData}
+                    isLoading={loading}
+                    availability={t("weatherData")}
+                  />
+                </div>
+                <div className="lg:w-[600px] overflow-x-scroll mt-10">
+                  <p className="text-xs pb-4">{t("note")}</p>
+                  <DateRangePicker
+                    onChange={(item: any) => {
+                      setState([item.selection]);
+                      if (state) {
+                        filterWeatherInformation({
+                          startDate: format(
+                            item.selection.startDate,
+                            "yyyy-MM-dd"
+                          ),
+                          endDate: format(item.selection.endDate, "yyyy-MM-dd"),
+                        });
+                      }
+                    }}
+                    moveRangeOnFirstSelection={true}
+                    months={1}
+                    ranges={state}
+                    direction="horizontal"
+                  />
+                </div>
+
                 <div className="flex items-end justify-end py-3">
                   <Button
                     className="!w-[180px] !bg-primary text-xs"
                     disabled={!areaSeries[0]?.data?.length}
                   >
-                    <CSVLink data={areaSeries}>Download Data</CSVLink>
+                    <CSVLink data={areaSeries}>{t("download")}</CSVLink>
                   </Button>
                 </div>
-
-                {areaSeries ? (
+                {weatherChartData ? (
                   <WeatherChart
                     id="area-chart"
                     type="line"
-                    colors={["#B619A6", "#380ABB"]}
+                    colors={["#B619A6", "#380ABB", "#fff"]}
                     series={areaSeries}
-                    categories={weekDays}
+                    categories={dateArray}
                     curve="smooth"
                     width={"100%"}
                   />
@@ -439,7 +629,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
               </div>
             </div>
 
-            <div className="grid grid-flow-col grid-cols-[auto] items-start overflow-x-scroll gap-2 py-6 lg:pb-8">
+            {/* <div className="grid grid-flow-col grid-cols-[auto] items-start overflow-x-scroll gap-2 py-6 lg:pb-8">
               {loading ? (
                 <div className="flex items-center justify-center">
                   <Spinner />
@@ -465,7 +655,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                   )}
                 </>
               )}
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -487,6 +677,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
               mapOfflineMessage={t("mapOfflineMessage")}
               name={t("name")}
               noWeather={t("noWeather")}
+              prep={t("prep")}
             />
           </div>
           <div className="md:h-[30vh] sticky top-0 left-0 z-10">
@@ -495,6 +686,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
               rows={tableArray}
               isLoading={loading}
               availability={t("availability")}
+              isHeight
             />
           </div>
         </div>

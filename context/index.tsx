@@ -22,6 +22,7 @@ type InfoType = {
   url: string;
   website: string;
   name: string;
+  formatted_address: string;
 };
 
 interface WeatherCountryType {
@@ -41,6 +42,8 @@ interface WeatherCountryType {
   allCountriesArray: (data: any) => void;
   countryInfo: InfoType;
   setCountryInfo: React.Dispatch<React.SetStateAction<InfoType>>;
+  weatherData: any;
+  setWeatherData: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const WeatherContext = createContext<WeatherCountryType | undefined>(undefined);
@@ -62,6 +65,7 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
     url: "",
     website: "",
     name: "",
+    formatted_address: "",
   });
   const addPlace = (newPlace: PlaceType) => {
     return setPlace({
@@ -72,6 +76,7 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
     });
   };
   const [value, setValue] = useState("");
+  const [weatherData, setWeatherData] = useState();
 
   const createCountries = (countryData: CountryEntries) => {
     if (countries) {
@@ -119,6 +124,8 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
         allCountriesArray,
         countryInfo,
         setCountryInfo,
+        weatherData,
+        setWeatherData,
       }}
     >
       {children}

@@ -15,9 +15,10 @@
   "noWeather": "No Weather Details",
   "humidity": "Humidity",
   "dewPoint": "Dew-Point",
+  "dew": "Dew",
   "windChill": "Wind-Chill",
   "mapOfflineMessage": "Can't load google map while offline",
-  "name": "name",
+  "name": "Country Name",
   "weather": "Weather",
   "description": "Get weather details",
   "clear": "clear",
@@ -43,5 +44,15 @@
   "population": "Population",
   "area": "Area",
   "capitalCoords": "Capital Coords",
-  "noFile": "No File"
+  "noFile": "No File",
+  "condition": "Condition",
+  "cloudCover": "Cloud",
+  "snow": "Snow",
+  "sunrise": "Sunrise",
+  "describe": "Description",
+  "dateTime": "DateTime",
+  "weatherData": "No Weather Data",
+  "prep": "Preciptype",
+  "download": "Download Data",
+  "note": "Note: The filter endpoint is a free version, so only a limited api calls can be made. Thank you"
 }

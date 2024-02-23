@@ -44,6 +44,28 @@ const Request = {
   async get<T = any>(endpoint: string, options?: AxiosRequestConfig | null) {
     return (await Axios.get(endpoint, options || {})).data;
   },
+
+  /**
+   * Makes a POST request
+   *
+   * @param endpoint
+   * @param data
+   * @param options
+   */
+
+  async post<T = any>(endpoint: string, options?: AxiosRequestConfig | null) {
+    let postData;
+    let requestOptions;
+
+    if (options) {
+      const { data, ...rest } = options;
+
+      postData = data;
+      requestOptions = rest;
+    }
+
+    return (await Axios.post(endpoint, postData, requestOptions)).data;
+  },
 };
 
 export default Request;

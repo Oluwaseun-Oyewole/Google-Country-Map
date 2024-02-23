@@ -31,3 +31,66 @@
   -webkit-appearance: none;
   appearance: none;
 }
+
+.rdrDateRangePickerWrapper {
+  background: #262742 !important;
+  padding: 10px 5px 10px 5px !important;
+  border: solid 0.5px lightgray !important;
+}
+
+.rdrDefinedRangesWrapper {
+  font-size: 12px;
+  border-right: solid 0.5px lightgrey !important;
+  background: #262742 !important;
+}
+
+.rdrCalendarWrapper {
+  background: #262742 !important;
+  color: #fff !important;
+}
+
+.rdrDateDisplayWrapper {
+  background-color: #3a3b65 !important;
+}
+
+/* for date form input */
+.rdrDateDisplayItem {
+}
+
+/* month pickers */
+.rdrMonthAndYearWrapper {
+  color: white !important;
+}
+
+.rdrMonthName {
+  margin: 10px 0px !important;
+}
+
+/* month picker select */
+.rdrMonthAndYearPickers select {
+  color: #262742 !important;
+  background-color: white !important;
+}
+
+.rdrMonthName,
+.rdrWeekDay,
+.rdrDayNumber > span {
+  color: #fff !important;
+}
+
+.rdrMonthName:hover,
+.rdrWeekDay:hover,
+.rdrStaticRanges > button :hover {
+  background: #3a3b65 !important;
+}
+
+.rdrStaticRange {
+  border-bottom: 1px solid #3a3b65 !important;
+  background: #262742 !important;
+  color: #fff !important;
+  font-weight: 400 !important;
+}
+
+.rdrInputRanges {
+  display: none !important;
+}

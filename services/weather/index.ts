@@ -1,6 +1,10 @@
 import Request from "..";
 import { Endpoints } from "../endpoints";
-import { CurrentWeatherDetailsParams, WeatherRequestParams } from "./types";
+import {
+  CurrentWeatherDetailsParams,
+  CurrentWeatherServicesRequestParams,
+  WeatherRequestParams,
+} from "./types";
 
 export const getWeatherForecasts = async (params: WeatherRequestParams) => {
   try {
@@ -60,5 +64,43 @@ export const getHourlyWeatherDetails = async (
     return response;
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const weatherInformation = async (
+  location: string,
+  params: CurrentWeatherServicesRequestParams
+) => {
+  try {
+    const response = await Request.get(
+      Endpoints.visualCrossingWeatherReport + location,
+      {
+        params: params,
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log("error fetching data", error);
+  }
+};
+
+export const FilterWeatherInformation = async (
+  location: any
+  // params: CurrentWeatherServicesRequestParams
+) => {
+  try {
+    const response = await Request.post(
+      Endpoints.visualCrossingWeatherReport + location,
+
+      { data: { key: `${process.env.NEXT_PUBLIC_WEATHER_VISUAL_API_KEY}` } }
+    );
+
+    console.log(
+      "location url",
+      Endpoints.visualCrossingWeatherReport + location
+    );
+    return response;
+  } catch (error) {
+    console.log("error fetching data", error);
   }
 };

@@ -23,4 +23,5 @@ export interface ITable extends ITableBase {
   rows: any[];
   selected?: boolean;
   availability?: string;
+  isHeight?: boolean;
 }

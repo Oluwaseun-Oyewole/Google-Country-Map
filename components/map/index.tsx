@@ -1,6 +1,5 @@
 "use client";
 import { useCountryData } from "@/context";
-import { truncate } from "@/helper";
 import {
   getCurrentWeatherDetails,
   getHourlyWeatherDetails,
@@ -33,6 +32,7 @@ type IMap = {
   name: string;
   mapOfflineMessage: string;
   noWeather: string;
+  prep: string;
 };
 const Map = ({
   coordinates,
@@ -50,9 +50,10 @@ const Map = ({
   mapOfflineMessage,
   name,
   noWeather,
+  prep,
 }: IMap) => {
   const [map, setMap] = useState<any>(null);
-  const { place, coordinate, setCoordinate, countryInfo } = useCountryData();
+  const { place, coordinate, setCoordinate, weatherData } = useCountryData();
   const [currentWeatherData, setCurrentWeatherData] = useState<any>();
   const [, setHourlyWeatherData] = useState<any>();
   const [, setError] = useState("");
@@ -125,6 +126,7 @@ const Map = ({
   useEffect(() => {
     new google.maps.InfoWindow({});
     const infoWindow = new google.maps.InfoWindow();
+
     if (navigator?.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
@@ -135,6 +137,7 @@ const Map = ({
           const { lat, lng } = pos;
           setCoordinate({ lat, lng });
         },
+
         () => {
           handleLocationError(true, infoWindow);
         }
@@ -243,10 +246,10 @@ const Map = ({
                         </p>
 
                         <p className="py-2">
-                          {coordinates}:
-                          {`latitude: ${coordinate?.lat} longitude: ${coordinate?.lng}`}
+                          {coordinates} :
+                          {` Latitude: ${coordinate?.lat} Longitude: ${coordinate?.lng}`}
                         </p>
-                        <div>
+                        {/* <div>
                           {url} :
                           <a
                             href={countryInfo?.url}
@@ -255,12 +258,12 @@ const Map = ({
                           >
                             {truncate(countryInfo?.url, 30)}
                           </a>
-                        </div>
+                        </div> */}
                         <p className="py-1">
                           {" "}
-                          {name} : {countryInfo?.name}
+                          {name} : {place?.country}
                         </p>
-                        <p>
+                        {/* <p>
                           {website}:
                           <a
                             href={countryInfo?.website}
@@ -269,40 +272,47 @@ const Map = ({
                           >
                             {countryInfo?.website}
                           </a>
-                        </p>
+                        </p> */}
                       </div>
 
                       <div className="py-2">
                         <h2 className="font-medium underline">
                           {weatherInfo}:
                         </h2>
-                        {currentWeatherData ? (
+                        {weatherData ? (
                           <>
                             <div className="flex items-center gap-4 py-2">
-                              <div>
-                                <div>
-                                  <p>
-                                    {summary} : {currentWeatherData?.summary}
-                                  </p>
-                                  <p>
-                                    {temperature} :
-                                    {currentWeatherData?.temperature}
-                                  </p>
-                                  <p>
-                                    {pressure} : {currentWeatherData?.pressure}
-                                  </p>
-                                  <p>
-                                    {humidity} : {currentWeatherData?.humidity}
-                                  </p>
-                                  <p>
-                                    {dewPoint} : {currentWeatherData?.dew_point}
-                                  </p>
-                                  <p>
-                                    {windChill} :
-                                    {currentWeatherData?.wind_chill}
-                                  </p>
-                                </div>
-                              </div>
+                              {weatherData?.map(
+                                (weather: any, index: number) => {
+                                  return (
+                                    <div key={index}>
+                                      <p>
+                                        {summary} : {weather?.description}
+                                      </p>
+                                      <p>
+                                        {temperature} :{weather?.temp}
+                                      </p>
+                                      <p>
+                                        {pressure} : {weather?.pressure}
+                                      </p>
+                                      <p>
+                                        {humidity} : {weather?.humidity}
+                                      </p>
+                                      <p>
+                                        {dewPoint} : {weather?.dew}
+                                      </p>
+                                      <p>
+                                        {windChill} : {weather?.windspeed}
+                                      </p>
+                                      <p>
+                                        {prep} :
+                                        {weather?.preciptype &&
+                                          weather?.preciptype[0]}
+                                      </p>
+                                    </div>
+                                  );
+                                }
+                              )}
                             </div>
                           </>
                         ) : (

@@ -9,9 +9,12 @@ function CustomTable({
   isLoading,
   emptyTableStyle,
   availability,
+  isHeight,
 }: ITable) {
   return (
-    <div className="lg:w-full h-[300px] overflow-x-scroll">
+    <div
+      className={`g:w-full ${isHeight && "min-h-[300px]"}  overflow-x-scroll`}
+    >
       <table
         className={classNames(
           `text-left border-spacing-y-3.5 border-spacing-x-3.5 bg-gray-800`,
