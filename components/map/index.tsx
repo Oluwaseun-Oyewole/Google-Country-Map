@@ -83,7 +83,7 @@ const Map = ({
   };
 
   useEffect(() => {
-    fetchCurrentWeatherDetails(coordinate);
+    // fetchCurrentWeatherDetails(coordinate);
     // fetchHourlyWeatherDetails(coordinate);
   }, [coordinate]);
 

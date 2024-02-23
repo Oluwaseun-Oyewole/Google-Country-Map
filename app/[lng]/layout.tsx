@@ -2,6 +2,7 @@ import Sidebar from "@/components/sidebar";
 import { dir } from "i18next";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Toaster } from "react-hot-toast";
 import { languages } from "../i18n/settings";
 import { lato, poppins } from "./fonts";
 import "./globals.css";
@@ -35,6 +36,7 @@ export default function RootLayout({
           <div
             className={`${poppins.variable} font-poppins overflow-scroll lg:overflow-hidden h-screen w-full`}
           >
+            <Toaster position="top-center" />
             <div>{children}</div>
           </div>
 

@@ -1,3 +1,4 @@
+import { handleRequestError } from "@/utils";
 import Request from "..";
 import { Endpoints } from "../endpoints";
 import {
@@ -17,7 +18,7 @@ export const getWeatherForecasts = async (params: WeatherRequestParams) => {
     });
     return response;
   } catch (error) {
-    console.log(error);
+    handleRequestError(error);
   }
 };
 
@@ -40,7 +41,7 @@ export const getCurrentWeatherDetails = async (
     });
     return response;
   } catch (error) {
-    console.log(error);
+    handleRequestError(error);
   }
 };
 
@@ -63,7 +64,7 @@ export const getHourlyWeatherDetails = async (
     });
     return response;
   } catch (error) {
-    console.log(error);
+    handleRequestError(error);
   }
 };
 
@@ -80,7 +81,7 @@ export const weatherInformation = async (
     );
     return response;
   } catch (error) {
-    console.log("error fetching data", error);
+    handleRequestError(error);
   }
 };
 
@@ -95,12 +96,8 @@ export const FilterWeatherInformation = async (
       { data: { key: `${process.env.NEXT_PUBLIC_WEATHER_VISUAL_API_KEY}` } }
     );
 
-    console.log(
-      "location url",
-      Endpoints.visualCrossingWeatherReport + location
-    );
     return response;
   } catch (error) {
-    console.log("error fetching data", error);
+    handleRequestError(error);
   }
 };

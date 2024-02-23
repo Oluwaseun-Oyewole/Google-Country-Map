@@ -17,6 +17,7 @@ import {
   getWeatherForecasts,
   weatherInformation,
 } from "@/services/weather";
+import { handleRequestError } from "@/utils";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -79,25 +80,25 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   const countryRegex = /<span class="country-name">(.*?)<\/span>/;
   const match = countryName.match(countryRegex);
   const country = match ? match[1] : "";
+
   const fetchCountryInfo = async (country: string) => {
     setLoading(true);
     if (!country || (country === "" && !countryName)) {
       setLoading(false);
     } else {
-      if (countryCache.current[country]) {
-        const data = countryCache.current[country];
-
-        setCountryData(data);
-      } else {
-        try {
-          const res = await Request.get(`${Endpoints.country}${country}`);
-          if (countryName && res) {
-            setCountryData(res);
-          }
-        } catch (error) {
-          console.log("error while fetching");
+      // if (countryCache.current[country]) {
+      //   const data = countryCache.current[country];
+      //   setCountryData(data);
+      // } else {
+      try {
+        const res = await Request.get(`${Endpoints.country}${country}`);
+        if (countryName && res) {
+          allCountriesArray(res);
         }
+      } catch (error) {
+        handleRequestError(error);
       }
+      // }
     }
     setLoading(false);
   };
@@ -150,11 +151,15 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
 
   useEffect(() => {
     fetchCountryInfo(country);
-  }, [countryName, coordinate]);
+  }, [country, countryName, coordinate]);
 
   useEffect(() => {
-    allCountriesArray(countryData);
-  }, [countryName]);
+    // fetchChartWeatherForecast(country);
+  }, [country]);
+
+  useEffect(() => {
+    fetchWeatherInfo();
+  }, [coordinate]);
 
   const handleSubmit = () => {
     if (!value) return;
@@ -311,10 +316,6 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     },
   ];
 
-  useEffect(() => {
-    // fetchChartWeatherForecast(country);
-  }, [country]);
-
   const [state, setState] = useState<IStateType[]>([
     {
       startDate: new Date(),
@@ -360,7 +361,6 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     windArray.push(weather.windspeed)
   );
 
-  console.log("wind", tempArray);
   // const wind = weatherData?.map((weather: any) =>
   //   weather.hours?.map((data: WeatherResponse) =>
   //     windArray.push(data.windspeed)
@@ -382,10 +382,6 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
       data: windArray,
     },
   ];
-
-  useEffect(() => {
-    fetchWeatherInfo();
-  }, [coordinate]);
 
   const weatherColumns = [
     {
@@ -567,7 +563,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                   <p className="text-xs">{t("monthlyForecast")}</p>
                 </div>
 
-                <div className="sticky top-0 left-0 z-10 my-10">
+                <div className="sticky top-0 left-0 z-10 my-5">
                   <CustomTable
                     cols={weatherColumns}
                     rows={weatherData}
@@ -680,7 +676,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
               prep={t("prep")}
             />
           </div>
-          <div className="md:h-[30vh] sticky top-0 left-0 z-10">
+          <div className="md:h-[30vh] sticky top-0 left-0 z-10 overflow-y-scroll">
             <CustomTable
               cols={columns}
               rows={tableArray}
