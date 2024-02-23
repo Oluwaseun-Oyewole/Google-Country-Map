@@ -5,6 +5,7 @@ import {
   getHourlyWeatherDetails,
 } from "@/services/weather";
 import { CurrentWeatherDetailsParams } from "@/services/weather/types";
+import { handleRequestError } from "@/utils";
 import {
   GoogleMap,
   InfoWindow,
@@ -56,7 +57,6 @@ const Map = ({
   const { place, coordinate, setCoordinate, weatherData } = useCountryData();
   const [currentWeatherData, setCurrentWeatherData] = useState<any>();
   const [, setHourlyWeatherData] = useState<any>();
-  const [, setError] = useState("");
 
   const fetchCurrentWeatherDetails = async (
     coordinate: CurrentWeatherDetailsParams
@@ -66,7 +66,7 @@ const Map = ({
       const res = await getCurrentWeatherDetails(coordinate);
       setCurrentWeatherData(res?.current);
     } catch (error) {
-      setError("Fetch Error");
+      handleRequestError(error);
     }
   };
 
@@ -78,7 +78,7 @@ const Map = ({
       const res = await getHourlyWeatherDetails(coordinate);
       setHourlyWeatherData(res?.hourly);
     } catch (error) {
-      setError("Fetch Error");
+      handleRequestError(error);
     }
   };
 

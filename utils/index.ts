@@ -6,7 +6,6 @@ export const handleRequestError = (
   error: AxiosError | any,
   defaultMessage = "An error occurred."
 ) => {
-  console.log("error from requests", error?.response.data);
   let useMessage = null;
   let statusCode = error.response?.status?.toString();
   if (statusCode?.startsWith("4") || statusCode?.startsWith("5")) {

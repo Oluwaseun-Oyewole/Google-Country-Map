@@ -92,7 +92,6 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
   };
 
   const allCountriesArray = (data: any) => {
-    console.log("testing country data", data);
     if (data) {
       if (
         !tableArray.some((obj: any) => obj.capital[0] === data[0].capital[0])
