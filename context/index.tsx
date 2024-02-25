@@ -25,6 +25,10 @@ type InfoType = {
   formatted_address: string;
 };
 
+export type TableArrayType = {
+  [key: string]: string | number | Array<any>;
+};
+
 interface WeatherCountryType {
   countryName: string;
   setCountryName: React.Dispatch<React.SetStateAction<string>>;
@@ -38,8 +42,8 @@ interface WeatherCountryType {
   setCoordinate: React.Dispatch<React.SetStateAction<CoordinateType>>;
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
-  tableArray: Array<any>;
-  allCountriesArray: (data: any) => void;
+  tableArray: Array<TableArrayType>;
+  allCountriesArray: (data: TableArrayType) => void;
   countryInfo: InfoType;
   setCountryInfo: React.Dispatch<React.SetStateAction<InfoType>>;
   weatherData: any;
@@ -60,7 +64,7 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
     lng: 0,
   });
   const [countryName, setCountryName] = useState("");
-  const [tableArray, setTableArray] = useState<any>([]);
+  const [tableArray, setTableArray] = useState<TableArrayType[]>([]);
   const [countryInfo, setCountryInfo] = useState<InfoType>({
     url: "",
     website: "",
