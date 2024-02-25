@@ -36,7 +36,7 @@ export default function RootLayout({
           <div
             className={`${poppins.variable} font-poppins overflow-scroll lg:overflow-hidden h-screen w-full`}
           >
-            <Toaster position="top-left" />
+            <Toaster position="top-center" />
             <div>{children}</div>
           </div>
 

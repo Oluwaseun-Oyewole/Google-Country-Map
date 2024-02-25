@@ -36,17 +36,14 @@ type WeatherResponse = {
   humidity: string;
   windspeed: string;
   datetime: string;
+  dew: string;
 };
 export default function Home({ params: { lng } }: { params: { lng: string } }) {
   if (languages.indexOf(lng) < 0) lng = fallbackLng;
   const { t } = useTranslation(lng);
   const { i18n } = useTranslation(lng);
-
   const [weatherForecastArray, setWeatherForecastArray] = useState([]);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [countryData, setCountryData] = useState<any>();
   const [loading, setLoading] = useState(false);
-
   const {
     value,
     setValue,
@@ -64,7 +61,6 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     endDate: Date;
     key: string;
   };
-
   const cache = useRef<any>({});
   const countryCache = useRef<any>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -150,7 +146,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   };
 
   useEffect(() => {
-    fetchCountryInfo(country);
+    // fetchCountryInfo(country);
   }, [country, countryName, coordinate]);
 
   useEffect(() => {
@@ -324,62 +320,40 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     },
   ]);
 
-  let tempArray: any = [];
-  // const temps = weatherData?.map((weather: any) =>
-  //   weather.hours?.map((data: WeatherResponse) => temptArray.push(data.temp))
-  // );
-
-  const temps = weatherData?.map((weather: WeatherResponse) =>
-    tempArray.push(weather.temp)
+  const temps = weatherForecastArray?.map(
+    (weather: WeatherResponse) => weather.temp
+  );
+  const chartDates = weatherForecastArray?.map(
+    (weather: WeatherResponse) => weather.datetime
+  );
+  const humidity = weatherForecastArray?.map(
+    (weather: WeatherResponse) => weather.humidity
+  );
+  const wind = weatherForecastArray?.map(
+    (weather: WeatherResponse) => weather.windspeed
   );
 
-  // const chartDates = weatherData?.map(
-  //   (weather: WeatherResponse) => weather.datetime
-  // );
-  let dateArray: any = [];
-  const chartDates = weatherData?.map((weather: WeatherResponse) =>
-    dateArray.push(weather.datetime)
+  const pressure = weatherForecastArray?.map(
+    (weather: WeatherResponse) => weather.dew
   );
-
-  // const chartDates = weatherData?.map((weather: any) =>
-  //   weather.hours?.map((data: WeatherResponse) => dateArray.push(data.datetime))
-  // );
-
-  let humidityArray: any = [];
-  const humidity = weatherForecastArray?.map((weather: WeatherResponse) =>
-    humidityArray.push(weather.humidity)
-  );
-
-  // const humidity = weatherData?.map((weather: any) =>
-  //   weather.hours?.map((data: WeatherResponse) =>
-  //     humidityArray.push(data.humidity)
-  //   )
-  // );
-
-  let windArray: any = [];
-  const wind = weatherForecastArray?.map((weather: WeatherResponse) =>
-    windArray.push(weather.windspeed)
-  );
-
-  // const wind = weatherData?.map((weather: any) =>
-  //   weather.hours?.map((data: WeatherResponse) =>
-  //     windArray.push(data.windspeed)
-  //   )
-  // );
 
   const areaSeries = [
     {
       name: "Temperature",
-      data: tempArray,
+      data: temps,
     },
 
     {
       name: "Humidity",
-      data: humidityArray,
+      data: humidity,
     },
     {
       name: "Wind Speed",
-      data: windArray,
+      data: wind,
+    },
+    {
+      name: "Pressure",
+      data: pressure,
     },
   ];
 
@@ -440,6 +414,26 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
       title: `${t("windSpeed")}`,
       dataIndex: "windspeed",
       key: "windspeed",
+    },
+
+    {
+      title: `${t("describe")}`,
+      dataIndex: "description",
+      key: "description",
+    },
+  ];
+
+  const weatherSummaryColumns = [
+    {
+      title: `${t("dateTime")}`,
+      dataIndex: "datetime",
+      key: "datetime",
+    },
+
+    {
+      title: `${t("condition")}`,
+      dataIndex: "conditions",
+      key: "conditions",
     },
 
     {
@@ -598,16 +592,18 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                     className="!w-[180px] !bg-primary text-xs"
                     disabled={!areaSeries[0]?.data?.length}
                   >
-                    <CSVLink data={areaSeries}>{t("download")}</CSVLink>
+                    <CSVLink data={areaSeries} className="text-xs py-5 px-7">
+                      {t("download")}
+                    </CSVLink>
                   </Button>
                 </div>
-                {weatherChartData ? (
+                {weatherForecastArray ? (
                   <WeatherChart
                     id="area-chart"
                     type="line"
-                    colors={["#B619A6", "#380ABB", "#fff"]}
+                    colors={["#B619A6", "#380ABB", "#fff", "#00FF00"]}
                     series={areaSeries}
-                    categories={dateArray}
+                    categories={chartDates}
                     curve="smooth"
                     width={"100%"}
                   />
@@ -622,6 +618,15 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                     width={"100%"}
                   />
                 )}
+
+                <div className=" mt-7 mb-4 md:h-[45vh] sticky top-0 left-0 z-10 overflow-y-scroll">
+                  <CustomTable
+                    cols={weatherSummaryColumns}
+                    rows={weatherForecastArray}
+                    isLoading={loading}
+                    availability={t("weatherData")}
+                  />
+                </div>
               </div>
             </div>
 
