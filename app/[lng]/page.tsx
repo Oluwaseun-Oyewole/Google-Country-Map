@@ -146,7 +146,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   };
 
   useEffect(() => {
-    // fetchCountryInfo(country);
+    fetchCountryInfo(country);
   }, [country, countryName, coordinate]);
 
   useEffect(() => {

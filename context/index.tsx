@@ -26,7 +26,7 @@ type InfoType = {
 };
 
 export type TableArrayType = {
-  [key: string]: string | number | Array<any>;
+  [key: string]: string | number;
 };
 
 interface WeatherCountryType {
