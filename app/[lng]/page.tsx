@@ -619,7 +619,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                   />
                 )}
 
-                <div className=" mt-7 mb-4 md:h-[45vh] sticky top-0 left-0 z-10 overflow-y-scroll">
+                <div className="mt-7 mb-4 md:h-[45vh] sticky top-0 left-0 z-10 overflow-y-scroll">
                   <CustomTable
                     cols={weatherSummaryColumns}
                     rows={weatherForecastArray}
