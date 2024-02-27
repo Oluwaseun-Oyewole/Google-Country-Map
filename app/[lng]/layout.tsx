@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   title: "Weather",
   description: "Get weather details",
   manifest: "/manifest.json",
-  icons: { apple: "/weather.png" },
 };
 
 export async function generateStaticParams() {
