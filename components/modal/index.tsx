@@ -1,4 +1,5 @@
 "use client";
+import classNames from "classnames";
 import { motion } from "framer-motion";
 import {
   ForwardRefRenderFunction,
@@ -19,11 +20,12 @@ export type IModalType = {
 type IModal = "post" | "default";
 type Props = {
   type?: IModal;
-  textObj: { text: string; message: string };
+  textObj: { text: string; message?: string };
+  modalClassName?: string;
 } & PropsWithChildren;
 
 const Modal: ForwardRefRenderFunction<IModalType, Props> = (
-  { children, type = "default", textObj: { text, message } },
+  { children, type = "default", textObj: { text, message }, modalClassName },
   ref
 ) => {
   const [open, setOpen] = useState(false);
@@ -78,7 +80,12 @@ const Modal: ForwardRefRenderFunction<IModalType, Props> = (
               // ref={modalRef}
             >
               <div>
-                <Button onClick={handleCancel}>{text}</Button>
+                <Button
+                  onClick={handleCancel}
+                  className={classNames(modalClassName)}
+                >
+                  {text}
+                </Button>
               </div>
               {children}
             </div>

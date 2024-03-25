@@ -3,6 +3,7 @@ import Logo from "@/assets/Logo.svg";
 import Logout from "@/assets/SignOff Icon.svg";
 import Plus from "@/assets/plus.svg";
 import { motion, stagger, useAnimate } from "framer-motion";
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
@@ -68,11 +69,11 @@ export const NavLink = ({ linkArray }: MenuProps) => {
           <div className="bg-primary flex items-center justify-center p-3 rounded-full fade">
             <Image src={Plus} alt="icon" className="w-8 " />
           </div>
-          <ul className="div">
+          <ul className="div cursor-pointer">
             <motion.li whileHover={{ scale: 1.2 }} className="fade">
-              <Link href="">
+              <div onClick={() => signOut({ callbackUrl: "/weather" })}>
                 <Image src={Logout} alt="icon" className="w-5" />
-              </Link>
+              </div>
             </motion.li>
           </ul>
         </div>

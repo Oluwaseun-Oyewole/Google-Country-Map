@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
 import { languages } from "../i18n/settings";
+import Provider from "../provider/layout";
 import { lato, poppins } from "./fonts";
 import "./globals.css";
 import Template from "./template";
@@ -38,7 +39,9 @@ export default function RootLayout({
             className={`${poppins.variable} font-poppins overflow-scroll lg:overflow-hidden h-screen w-full`}
           >
             <Toaster position="top-center" />
-            <div>{children}</div>
+            <div>
+              <Provider>{children}</Provider>
+            </div>
           </div>
 
           <Script

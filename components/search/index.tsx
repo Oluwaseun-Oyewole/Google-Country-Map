@@ -72,10 +72,13 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
   const countryRegex = /<span class="country-name">(.*?)<\/span>/;
   const match = countryName.match(countryRegex);
   const country = match ? match[1] : "";
+  const localityRegex = /<span class="locality">(.*?)<\/span>/;
+  const localityMatch = countryName.match(localityRegex);
+  const locality = localityMatch ? localityMatch[1] : "";
 
   useEffect(() => {
     addObjectToList({
-      countryName: country,
+      countryName: locality ? locality : country,
       coordinates: { lat: coordinate.lat, lng: coordinate.lng },
     });
   }, [countryName]);

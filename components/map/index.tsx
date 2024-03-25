@@ -18,23 +18,25 @@ import { Offline, Online } from "react-detect-offline";
 import Spinner from "../loader";
 
 type IMap = {
-  currentLocation: string;
-  locationDetails: string;
-  coordinates: string;
-  url: string;
-  website: string;
-  weatherInfo: string;
-  summary: string;
-  temperature: string;
-  pressure: string;
-  humidity: string;
-  dewPoint: string;
-  windChill: string;
-  name: string;
-  mapOfflineMessage: string;
-  noWeather: string;
-  prep: string;
+  currentLocation?: string;
+  locationDetails?: string;
+  coordinates?: string;
+  url?: string;
+  website?: string;
+  weatherInfo?: string;
+  summary?: string;
+  temperature?: string;
+  pressure?: string;
+  humidity?: string;
+  dewPoint?: string;
+  windChill?: string;
+  name?: string;
+  mapOfflineMessage?: string;
+  noWeather?: string;
+  prep?: string;
   width?: number;
+  zoom?: number;
+  setZoom?: number;
 };
 const Map = ({
   coordinates,
@@ -54,6 +56,8 @@ const Map = ({
   noWeather,
   prep,
   width,
+  zoom,
+  setZoom,
 }: IMap) => {
   const [map, setMap] = useState<any>(null);
   const {
@@ -80,7 +84,7 @@ const Map = ({
     }
   };
 
-  console.log("current weather", currentWeatherData);
+  // console.log("current weather", currentWeatherData);
 
   const fetchHourlyWeatherDetails = async (
     coordinate: CurrentWeatherDetailsParams
@@ -187,12 +191,12 @@ const Map = ({
               mapContainerStyle={containerStyle}
               mapContainerClassName="bg-[##3A3B65]"
               center={coordinate}
-              zoom={12}
+              zoom={zoom ?? 12}
               onLoad={onLoad}
               onUnmount={onUnmount}
               onZoomChanged={() => {}}
               onCenterChanged={() => {
-                map?.setZoom(10);
+                map?.setZoom(setZoom ?? 10);
               }}
               onClick={closeNotification}
               options={{

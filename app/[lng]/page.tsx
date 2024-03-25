@@ -20,17 +20,19 @@ import {
 import { handleRequestError } from "@/utils";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { CSVLink } from "react-csv";
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main css file
 import "react-date-range/dist/theme/default.css"; // theme css file
+import { TbError404Off } from "react-icons/tb";
 import { useTranslation } from "../i18n/client";
-import { fallbackLng, languages } from "../i18n/settings";
+import { languages } from "../i18n/settings";
 import { LanguageSwitcher } from "./components/switcher";
 
-// let uploadRQSTController: AbortController | null = null;
 type WeatherResponse = {
   temp: string;
   humidity: string;
@@ -39,7 +41,8 @@ type WeatherResponse = {
   dew: string;
 };
 export default function Home({ params: { lng } }: { params: { lng: string } }) {
-  if (languages.indexOf(lng) < 0) lng = fallbackLng;
+  // if (languages.indexOf(lng) < 0) lng = fallbackLng;
+  const session = useSession();
   const { t } = useTranslation(lng);
   const { i18n } = useTranslation(lng);
   const [weatherForecastArray, setWeatherForecastArray] = useState([]);
@@ -443,6 +446,31 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     },
   ];
 
+  const router = useRouter();
+  const handleRouterClick = () => {
+    if (session.status === "unauthenticated") {
+      router.push("/weather");
+    } else {
+      router.push("/en");
+    }
+  };
+  if (languages.indexOf(lng) < 0) {
+    return (
+      <div className="flex items-center justify-center text-white h-screen gap-6 flex-col">
+        <TbError404Off className="text-white text-7xl" />
+        <div>{"We can't find the page you are looking for."}</div>
+        {session.status === "unauthenticated" ? (
+          <Button className="!w-[22%]" onClick={handleRouterClick}>
+            Back to Home
+          </Button>
+        ) : (
+          <Button className="!w-[20%]" onClick={handleRouterClick}>
+            Back
+          </Button>
+        )}
+      </div>
+    );
+  }
   return (
     <Suspense fallback={<Spinner />}>
       <Modal
