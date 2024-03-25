@@ -5,6 +5,11 @@ import { forwardRef, useEffect, useRef, useState } from "react";
 import { Offline, Online } from "react-detect-offline";
 import Input from "../input";
 
+export interface MyObject {
+  countryName: string;
+  coordinates: { lat: number; lng: number };
+  // Add other properties as needed
+}
 type ISearchPropsType = {
   isClassName?: boolean;
   textObj: {
@@ -31,14 +36,55 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
     coordinate,
     setCoordinate,
     setValue,
+    countryName,
     setCountryName,
     setCountryInfo,
+    closeNotification,
+    handleIsNotificationOpen,
   } = useCountryData();
+
+  const checkIfObjectInArray = (
+    object: MyObject,
+    array: MyObject[]
+  ): boolean => {
+    return array.some(
+      (item) =>
+        item.countryName === object.countryName &&
+        item.coordinates.lat === object.coordinates.lat
+    );
+  };
+
+  const addObjectToList = (object: MyObject) => {
+    let currentList: MyObject[] = [];
+    const storedList = localStorage.getItem("myCountries");
+    if (storedList) {
+      currentList = JSON.parse(storedList);
+    }
+    const obj = checkIfObjectInArray(object, currentList);
+    if (obj || object.countryName === "") {
+      return;
+    } else {
+      currentList.push(object);
+      localStorage.setItem("myCountries", JSON.stringify(currentList));
+    }
+  };
+
+  const countryRegex = /<span class="country-name">(.*?)<\/span>/;
+  const match = countryName.match(countryRegex);
+  const country = match ? match[1] : "";
+
+  useEffect(() => {
+    addObjectToList({
+      countryName: country,
+      coordinates: { lat: coordinate.lat, lng: coordinate.lng },
+    });
+  }, [countryName]);
 
   const updateURLFromSearchQuery = (query: any) => {
     const params = new URLSearchParams(searchParams);
     params.set("query", query);
     router.push(`?${params.toString()}`);
+    handleIsNotificationOpen();
   };
 
   const options = {
@@ -54,12 +100,12 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
     strictBounds: false,
   };
   let autoComplete: any;
+
   const loadGoogleAutoComplete = async (autoCompleteRef: any) => {
     autoComplete = new window.google.maps.places.Autocomplete(
       autoCompleteRef?.current,
       options
     );
-
     autoComplete.addListener("place_changed", () => {
       const place = autoComplete.getPlace();
       setCountryInfo(place);
@@ -84,6 +130,7 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
       }
     });
   };
+
   useEffect(() => {
     if (typeof window !== undefined && !window.google) {
       setTimeout(() => {
@@ -104,6 +151,7 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
             clearValue={clearValue}
             onChange={(event) => {
               setValue(event?.target?.value);
+              closeNotification();
             }}
             placeholder={`${search}`}
             className="pac-input"
@@ -118,6 +166,7 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
           clearValue={clearValue}
           onChange={(event) => {
             setValue(event?.target?.value);
+            closeNotification();
           }}
           placeholder={`${search}`}
           className="pac-input"

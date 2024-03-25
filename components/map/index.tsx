@@ -34,6 +34,7 @@ type IMap = {
   mapOfflineMessage: string;
   noWeather: string;
   prep: string;
+  width?: number;
 };
 const Map = ({
   coordinates,
@@ -52,9 +53,17 @@ const Map = ({
   name,
   noWeather,
   prep,
+  width,
 }: IMap) => {
   const [map, setMap] = useState<any>(null);
-  const { place, coordinate, setCoordinate, weatherData } = useCountryData();
+  const {
+    place,
+    coordinate,
+    setCoordinate,
+    weatherData,
+    closeNotification,
+    setWeatherData,
+  } = useCountryData();
   const [currentWeatherData, setCurrentWeatherData] = useState<any>();
   const [, setHourlyWeatherData] = useState<any>();
 
@@ -65,10 +74,13 @@ const Map = ({
     try {
       const res = await getCurrentWeatherDetails(coordinate);
       setCurrentWeatherData(res?.current);
+      // setWeatherData(res?.current);
     } catch (error) {
       handleRequestError(error);
     }
   };
+
+  console.log("current weather", currentWeatherData);
 
   const fetchHourlyWeatherDetails = async (
     coordinate: CurrentWeatherDetailsParams
@@ -89,7 +101,7 @@ const Map = ({
 
   const containerStyle = {
     width: "100%",
-    height: "470px",
+    height: `${width ? `${width}vh` : "470px"}`,
   };
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -182,6 +194,7 @@ const Map = ({
               onCenterChanged={() => {
                 map?.setZoom(10);
               }}
+              onClick={closeNotification}
               options={{
                 mapTypeControl: false,
                 panControl: true,

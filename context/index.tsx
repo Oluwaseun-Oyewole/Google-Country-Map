@@ -48,6 +48,12 @@ interface WeatherCountryType {
   setCountryInfo: React.Dispatch<React.SetStateAction<InfoType>>;
   weatherData: any;
   setWeatherData: React.Dispatch<React.SetStateAction<any>>;
+  openNotification?: boolean;
+  toggleNotification: () => void;
+  closeNotification: () => void;
+  isNotificationOpen?: boolean;
+  handleIsNotificationOpen: () => void;
+  handleIsNotificationClose: () => void;
 }
 
 const WeatherContext = createContext<WeatherCountryType | undefined>(undefined);
@@ -109,6 +115,25 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
     }
   };
 
+  const [openNotification, setOpenNotification] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
+  const handleIsNotificationClose = () => {
+    setIsNotificationOpen(false);
+  };
+
+  const handleIsNotificationOpen = () => {
+    setIsNotificationOpen(true);
+  };
+
+  const toggleNotification = () => {
+    setOpenNotification(!openNotification);
+  };
+
+  const closeNotification = () => {
+    setOpenNotification(false);
+  };
+
   return (
     <WeatherContext.Provider
       value={{
@@ -130,6 +155,12 @@ export const WeatherProvider: React.FC<PropsWithChildren> = ({ children }) => {
         setCountryInfo,
         weatherData,
         setWeatherData,
+        openNotification,
+        closeNotification,
+        toggleNotification,
+        isNotificationOpen,
+        handleIsNotificationClose,
+        handleIsNotificationOpen,
       }}
     >
       {children}

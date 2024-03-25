@@ -10,6 +10,9 @@ export const config = {
 };
 
 export function middleware(req: NextRequest) {
+  if (req.nextUrl.pathname.startsWith("/weather")) {
+    NextResponse.redirect(new URL("/weather", req.url));
+  }
   if (
     req.nextUrl.pathname.indexOf("icon") > -1 ||
     req.nextUrl.pathname.indexOf("chrome") > -1

@@ -21,6 +21,7 @@ type Props = {
   type?: IModal;
   textObj: { text: string; message: string };
 } & PropsWithChildren;
+
 const Modal: ForwardRefRenderFunction<IModalType, Props> = (
   { children, type = "default", textObj: { text, message } },
   ref
