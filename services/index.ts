@@ -66,6 +66,16 @@ const Request = {
 
     return (await Axios.post(endpoint, postData, requestOptions)).data;
   },
+
+  /**
+   * Makes a DELETE request
+   *
+   * @param endpoint
+   * @param options
+   */
+  async delete<T = any>(endpoint: string, options?: AxiosRequestConfig | null) {
+    return (await Axios.delete(endpoint, options || {})).data;
+  },
 };
 
 export default Request;

@@ -1,5 +1,6 @@
 "use client";
 import { useCountryData } from "@/context";
+import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { Offline, Online } from "react-detect-offline";
@@ -27,6 +28,7 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
   ref
 ) => {
   const router = useRouter();
+  const session = useSession();
   const searchParams = useSearchParams();
   const searchParamsQuery = searchParams.get("query");
   let autoCompleteRef = useRef(null);
@@ -64,8 +66,11 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
     if (obj || object.countryName === "") {
       return;
     } else {
-      currentList.push(object);
-      localStorage.setItem("myCountries", JSON.stringify(currentList));
+      if (session?.status === "unauthenticated") {
+        currentList.push(object);
+        localStorage.setItem("myCountries", JSON.stringify(currentList));
+      }
+      return;
     }
   };
 
@@ -90,6 +95,11 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
     handleIsNotificationOpen();
   };
 
+  // const handleFetch = async () => {
+  //   const res = await getAllUserCities({ email: "s@gmail.com" });
+  //   console.log("response", res);
+  // };
+
   const options = {
     fields: [
       "formatted_address",
@@ -109,9 +119,11 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
       autoCompleteRef?.current,
       options
     );
+
     autoComplete.addListener("place_changed", () => {
       const place = autoComplete.getPlace();
       setCountryInfo(place);
+
       if (!place?.geometry || !place?.geometry.location) {
         window.alert(alert + place?.name + "");
         return;

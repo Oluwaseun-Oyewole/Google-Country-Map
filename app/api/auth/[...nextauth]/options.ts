@@ -1,3 +1,5 @@
+import { mongoDBConnection } from "@/lib/mongodb";
+import { WeatherUsers } from "@/models/weatherUsers";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GithubProvider, { GithubProfile } from "next-auth/providers/github";
@@ -40,6 +42,31 @@ export const options: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "credentials") {
+        return true;
+      }
+      if (account?.provider === "github" || account?.provider === "google") {
+        await mongoDBConnection();
+        try {
+          const existingUser = await WeatherUsers.findOne({
+            email: user.email,
+          });
+
+          if (!existingUser) {
+            await WeatherUsers.create({
+              name: user?.name,
+              email: user?.email,
+              emailVerified: new Date(),
+            });
+            return true;
+          }
+        } catch (error) {
+          return false;
+        }
+      }
+      return true;
+    },
     // async redirect({ url, baseUrl }) {
     //   console.log("url", url);
     //   console.log("base url", baseUrl)

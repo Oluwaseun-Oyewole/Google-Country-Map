@@ -13,7 +13,9 @@ export default withAuth(async function middleware(req: NextRequest) {
   const isPublicRoutes = publicRoutes.includes(nextUrl.pathname);
   const isWeatherRoutes = nextUrl.pathname.startsWith("/weather");
   const token = await getToken({ req });
-  const isAuthenticated = true;
+
+  console.log("token", token);
+  const isAuthenticated = !!token;
   console.log("is Authenticated", isAuthenticated);
   if (
     req.nextUrl.pathname.indexOf("icon") > -1 ||

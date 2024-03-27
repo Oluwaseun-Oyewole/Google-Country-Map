@@ -66,9 +66,10 @@ const Map = ({
     setCoordinate,
     weatherData,
     closeNotification,
-    setWeatherData,
+    openInfo,
+    setOpenInfo,
   } = useCountryData();
-  const [currentWeatherData, setCurrentWeatherData] = useState<any>();
+  const [, setCurrentWeatherData] = useState<any>();
   const [, setHourlyWeatherData] = useState<any>();
 
   const fetchCurrentWeatherDetails = async (
@@ -84,8 +85,6 @@ const Map = ({
     }
   };
 
-  // console.log("current weather", currentWeatherData);
-
   const fetchHourlyWeatherDetails = async (
     coordinate: CurrentWeatherDetailsParams
   ) => {
@@ -98,14 +97,14 @@ const Map = ({
     }
   };
 
-  useEffect(() => {
-    // fetchCurrentWeatherDetails(coordinate);
-    // fetchHourlyWeatherDetails(coordinate);
-  }, [coordinate]);
+  // useEffect(() => {
+  //   // fetchCurrentWeatherDetails(coordinate);
+  //   // fetchHourlyWeatherDetails(coordinate);
+  // }, [coordinate]);
 
   const containerStyle = {
     width: "100%",
-    height: `${width ? `${width}vh` : "470px"}`,
+    height: `${width ? `${width}vh` : "500px"}`,
   };
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
@@ -142,7 +141,6 @@ const Map = ({
   useEffect(() => {
     new google.maps.InfoWindow({});
     const infoWindow = new google.maps.InfoWindow();
-
     if (navigator?.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
@@ -180,7 +178,6 @@ const Map = ({
   };
 
   const places = useMemo(() => generatePlaces(coordinate), [coordinate]);
-  const [openInfo, setOpenInfo] = useState(false);
 
   return (
     <>
@@ -250,7 +247,7 @@ const Map = ({
               >
                 {openInfo && (
                   <InfoWindow onCloseClick={() => setOpenInfo(false)}>
-                    <div className="text-black font-poppins text-xs shadow-lg pr-4">
+                    <div className="text-black font-poppins text-xs shadow-lg pr-4 relative z-50">
                       <div className="font-medium py-2">
                         <p>
                           {currentLocation} : {place?.country}
@@ -276,10 +273,11 @@ const Map = ({
                             {truncate(countryInfo?.url, 30)}
                           </a>
                         </div> */}
-                        <p className="py-1">
-                          {" "}
-                          {name} : {place?.country}
-                        </p>
+                        {place?.country && (
+                          <p className="py-1">
+                            {name} : {place?.country}
+                          </p>
+                        )}
                         {/* <p>
                           {website}:
                           <a

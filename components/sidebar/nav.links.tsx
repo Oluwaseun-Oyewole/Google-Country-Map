@@ -9,6 +9,9 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { IRoutesType, Routes } from "./routes";
 
+type MenuProps = {
+  linkArray: Array<IRoutesType>;
+};
 const staggerMenuItems = stagger(0.25, { startDelay: 0.4 });
 function useMenuAnimation() {
   const [scope, animate] = useAnimate();
@@ -26,13 +29,8 @@ function useMenuAnimation() {
   return scope;
 }
 
-type MenuProps = {
-  linkArray: Array<IRoutesType>;
-};
-
 export const NavLink = ({ linkArray }: MenuProps) => {
   const scope = useMenuAnimation();
-
   return (
     <>
       <nav
@@ -70,8 +68,12 @@ export const NavLink = ({ linkArray }: MenuProps) => {
             <Image src={Plus} alt="icon" className="w-8 " />
           </div>
           <ul className="div cursor-pointer">
-            <motion.li whileHover={{ scale: 1.2 }} className="fade">
-              <div onClick={() => signOut({ callbackUrl: "/weather" })}>
+            <motion.li
+              whileHover={{ scale: 1.2 }}
+              className="fade"
+              onClick={() => signOut({ callbackUrl: "/weather" })}
+            >
+              <div>
                 <Image src={Logout} alt="icon" className="w-5" />
               </div>
             </motion.li>

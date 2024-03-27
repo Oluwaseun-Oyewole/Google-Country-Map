@@ -1,20 +1,23 @@
 "use client";
 import Bell from "@/assets/notification-03.svg";
 import Button from "@/components/button";
+import Spinner from "@/components/loader";
 import Map from "@/components/map";
 import Modal, { IModalType } from "@/components/modal";
 import GooglePlaceSearch, { MyObject } from "@/components/search";
 import { useCountryData } from "@/context";
+import { weatherInformation } from "@/services/weather";
 import { motion } from "framer-motion";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BsGithub } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
 
 export default function Home() {
-  const { push } = useRouter();
+  const session = useSession();
+  const { push, replace } = useRouter();
   const {
     openNotification,
     toggleNotification,
@@ -23,6 +26,9 @@ export default function Home() {
     setPlace,
     isNotificationOpen,
     handleIsNotificationClose,
+    setWeatherData,
+    coordinate,
+    setOpenInfo,
   } = useCountryData();
 
   const autoCompleteReference = useRef(null);
@@ -30,6 +36,7 @@ export default function Home() {
   const [countries, setCountries] = useState([]);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (window && typeof window !== undefined) {
       const countries = localStorage.getItem("myCountries")!;
@@ -55,78 +62,87 @@ export default function Home() {
     setPlace({ country: countryName, lat, long: lng });
   };
 
-  const getCityName = (country: string) => {
-    const countryRegex = /<span class="locality">(.*?)<\/span>/;
-    const match = country.match(countryRegex);
-    const locality = match ? match[1] : "";
-    return locality;
+  const fetchWeatherInfo = async () => {
+    setLoading(true);
+    const res = await weatherInformation(
+      `${coordinate.lat},${coordinate.lng}/today`,
+      {
+        key: `${process.env.NEXT_PUBLIC_WEATHER_VISUAL_API_KEY}`,
+      }
+    );
+    if (res) {
+      setWeatherData(res?.days);
+    }
+    setLoading(false);
   };
 
-  // console.log("session", session.status);
+  useEffect(() => {
+    fetchWeatherInfo();
+  }, [coordinate]);
 
-  // useLayoutEffect(() => {
-  //   if (window && typeof window !== undefined) {
-  //     replace("/weather");
-  //   }
-  // }, []);
+  useLayoutEffect(() => {
+    if (window && typeof window !== undefined) {
+      replace("/weather");
+    }
+  }, []);
 
-  // if (session.status === "authenticated") {
-  //   router.push("/en");
-  // }
-
+  if (session.status === "authenticated") {
+    router.push("/en");
+  }
   return (
-    <Suspense fallback={<p>Loading state -- </p>}>
-      <main className="bg-gray-100">
-        {openNotification && (
-          <motion.div
-            className="absolute z-30 top-40 md:top-24 right-3 lg:w-[23%] bg-white text-xs shadow-lg p-4 overflow-y-scroll"
-            variants={variants}
-            initial="initial"
-            animate="animate"
-          >
-            <p className="underline pb-2"> Recent Searches</p>
-            <div className="flex gap-2 flex-col">
-              {countries?.map((country: MyObject, index: number) => {
-                return (
-                  <div
-                    key={index}
-                    className="flex gap-1 hover:text-blue-500 cursor-pointer"
-                    onClick={() => {
-                      handleCoordinateChange(
-                        country.countryName,
-                        country.coordinates.lat,
-                        country.coordinates.lng
-                      );
-                    }}
-                  >
-                    <p>{country?.countryName} </p>
-                    {country?.countryName && (
-                      <div className="flex gap-2">
-                        ( <p>{country.coordinates?.lat}</p>,
-                        <p>{country.coordinates?.lng}</p>)
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+    <Suspense fallback={<Spinner />}>
+      <main className="bg-gray-50">
+        <div>
+          {openNotification && (
+            <motion.div
+              className="absolute z-30 top-40 md:top-24 right-3 lg:w-[23%] h-[550px] overflow-y-scroll bg-white text-xs shadow-lg p-4"
+              variants={variants}
+              initial="initial"
+              animate="animate"
+            >
+              <p className="underline pb-2"> Recent Searches</p>
+              <div className="flex gap-2 flex-col">
+                {countries?.map((country: MyObject, index: number) => {
+                  return (
+                    <div
+                      key={index}
+                      className="flex gap-1 hover:text-blue-500 cursor-pointer"
+                      onClick={() => {
+                        handleCoordinateChange(
+                          country.countryName,
+                          country.coordinates.lat,
+                          country.coordinates.lng
+                        );
+                      }}
+                    >
+                      <p>{country?.countryName} </p>
+                      {country?.countryName && (
+                        <div className="flex gap-2">
+                          ( <p>{country.coordinates?.lat}</p>,
+                          <p>{country.coordinates?.lng}</p>)
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
 
-            {countries?.length > 0 && (
-              <p
-                className="pt-5 text-red-500 cursor-pointer"
-                onClick={() => {
-                  if (window && typeof window !== undefined) {
-                    localStorage.removeItem("myCountries");
-                    window.location.reload();
-                  }
-                }}
-              >
-                Clear searches
-              </p>
-            )}
-          </motion.div>
-        )}
-
+              {countries?.length > 0 && (
+                <p
+                  className="pt-5 text-red-500 cursor-pointer"
+                  onClick={() => {
+                    if (window && typeof window !== undefined) {
+                      localStorage.removeItem("myCountries");
+                      window.location.reload();
+                    }
+                  }}
+                >
+                  Clear searches
+                </p>
+              )}
+            </motion.div>
+          )}
+        </div>
         <Modal
           ref={modalRef}
           textObj={{ text: "close" }}
@@ -152,7 +168,10 @@ export default function Home() {
         </Modal>
 
         <div className="h-screen">
-          <div className="pt-6 absolute top-0 left-0 z-20 md:flex items-center justify-between gap-5 w-full md:w-[94%]">
+          <div
+            className="pt-6 absolute top-0 left-0 z-20 md:flex items-center justify-between gap-5 w-full md:w-[94%]"
+            onClick={() => setOpenInfo(false)}
+          >
             <div className="px-5 md:px-0 md:pl-5 w-full md:w-[40%]">
               <GooglePlaceSearch
                 isClassName
