@@ -469,7 +469,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   };
   if (languages.indexOf(lng) < 0) {
     return (
-      <div className="flex items-center justify-center text-white h-screen gap-6 flex-col">
+      <div className="flex items-center justify-center text-white h-screen gap-6 flex-col md:max-w-[100%] w-full">
         <TbError404Off className="text-white text-8xl" />
         <div>{"We can't find the page you are looking for."}</div>
         {session.status === "unauthenticated" ? (
@@ -487,7 +487,6 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
 
   if (session.status === "authenticated")
     return (
-      // <Suspense fallback={<Spinner />}>
       <main className="max-w-[92%] md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
         <Modal
           ref={modal}
@@ -769,6 +768,5 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
           </div>
         </div>
       </main>
-      // </Suspense>
     );
 }
