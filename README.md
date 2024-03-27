@@ -1,8 +1,8 @@
-### Google Weather Map
+### Weather Map
 
 #### Project Overview
 
-    Google Weather Map shows the weather condition of a place, shows the details on the map with markers, renders weather and country info on custom tables, select between languages, filter weather forecast.
+    Weather Map shows the weather condition of a place, shows the details on the map with markers, renders weather and country info on custom tables, select between languages, filter weather forecast.
 
 #### Features:
 
@@ -16,20 +16,26 @@ Charts
 Chart Filter
 Autocomplete Modal
 Weather Forecast Chart
+PWA
+Next Authentication
+Notification
 ```
 
 #### Technologies
 
 ```bash
 React
-Next
+NextJS
 Google
 Tailwind
 Typescript
+Mongodb
+Mongoose
 ```
 
-[Google-Weather-Map](https://google-country-weather-map.vercel.app/en)
-
+[Google-Weather-Map](https://weatherr-map.vercel.app/)
+![screenshot](<assets/Screenshot 2024-03-27 at 22.14.13.png>)
+![screenshot](<assets/Screenshot 2024-03-27 at 22.14.20.png>)
 ![screenshot](<assets/Screenshot 2024-02-23 at 13.28.17.png>)
 ![screenshot](<assets/Screenshot 2024-02-23 at 13.33.52.png>)
 ![screenshot](<assets/Screenshot 2024-02-25 at 22.15.03.png>)
