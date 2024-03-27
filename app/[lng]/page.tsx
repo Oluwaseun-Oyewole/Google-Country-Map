@@ -314,9 +314,9 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
 
     // flor handling file submission
 
-    // const formData = new FormData();
-    // formData.append("file", file as File);
-    // formData.append("upload_preset", "ml_default");
+    const formData = new FormData();
+    formData.append("file", file as File);
+    formData.append("upload_preset", "ml_default");
 
     // if (!uploadRQSTController) {
     //   uploadRQSTController = new AbortController();

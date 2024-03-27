@@ -63,6 +63,5 @@ export const config = {
     "/en",
     "/de",
     "/api/auth",
-    // "/weather",
   ],
 };

@@ -19,6 +19,10 @@ import {
 import { Swiper, SwiperSlide } from "swiper/react";
 import Spinner from "../spinner";
 
+interface CountryInterface {
+  name: string;
+  location: { coordinates: Array<number> };
+}
 const City = () => {
   const {
     value,
@@ -26,7 +30,6 @@ const City = () => {
     coordinate,
     addPlace,
     setCountryName,
-    setValue,
     handleIsNotificationOpen,
   } = useCountryData();
   const [countryData, setCountryData] = useState([]);
@@ -63,7 +66,7 @@ const City = () => {
     fetchCountries();
   };
 
-  const updateURLFromSearchQuery = (query: any) => {
+  const updateURLFromSearchQuery = (query: string) => {
     const params = new URLSearchParams(searchParams);
     params.set("query", query);
     router.push(`?${params.toString()}`);
@@ -134,7 +137,7 @@ const City = () => {
             <div>
               {countryData?.length > 0 ? (
                 <>
-                  {countryData?.map((country: any, index) => {
+                  {countryData?.map((country: CountryInterface, index) => {
                     return (
                       <SwiperSlide key={index}>
                         <div
@@ -159,7 +162,7 @@ const City = () => {
                               }
                               className="text-[10px] py-2"
                             >
-                              Image should be here{" "}
+                              Image upload feature soon...
                             </p>
 
                             {/* <Image src={country?.image} alt="country image" /> */}
