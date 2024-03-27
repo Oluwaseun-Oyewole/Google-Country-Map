@@ -17,6 +17,7 @@ import { FcGoogle } from "react-icons/fc";
 
 export default function Home() {
   const session = useSession();
+
   const { push, replace } = useRouter();
   const {
     openNotification,
@@ -29,14 +30,20 @@ export default function Home() {
     setWeatherData,
     coordinate,
     setOpenInfo,
+    place,
   } = useCountryData();
 
   const autoCompleteReference = useRef(null);
   const modalRef = useRef<IModalType>(null);
   const [countries, setCountries] = useState([]);
   const searchParams = useSearchParams();
+  const formatted_address =
+    place?.country.split(",")[place?.country?.split.length - 1];
+
+  const splitPlace = place?.country?.split(",");
+  const formattedCountryAddress = splitPlace[splitPlace.length - 1];
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     if (window && typeof window !== undefined) {
       const countries = localStorage.getItem("myCountries")!;
@@ -50,20 +57,24 @@ export default function Home() {
     initial: { opacity: 0, y: -20 },
     animate: { opacity: 1, y: 0, transition: { duration: 0.7 } },
   };
+  const updateRouteParams = (countryName?: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("callbackUrl");
+    countryName && params.set("query", countryName);
+    push(`?${params.toString()}`);
+  };
+
   const handleCoordinateChange = (
     countryName: string,
     lat: number,
     lng: number
   ) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("query", countryName);
-    push(`?${params.toString()}`);
+    updateRouteParams(countryName);
     setCoordinate({ lat, lng });
     setPlace({ country: countryName, lat, long: lng });
   };
 
   const fetchWeatherInfo = async () => {
-    setLoading(true);
     const res = await weatherInformation(
       `${coordinate.lat},${coordinate.lng}/today`,
       {
@@ -73,11 +84,11 @@ export default function Home() {
     if (res) {
       setWeatherData(res?.days);
     }
-    setLoading(false);
   };
 
   useEffect(() => {
     fetchWeatherInfo();
+    updateRouteParams(formatted_address ?? formattedCountryAddress);
   }, [coordinate]);
 
   useLayoutEffect(() => {
@@ -210,7 +221,7 @@ export default function Home() {
           <Map
             width={100}
             zoom={12}
-            setZoom={13}
+            setZoom={12}
             coordinates={"coordinates"}
             currentLocation={"currentLocation"}
             locationDetails={"locationDetails"}

@@ -249,9 +249,11 @@ const Map = ({
                   <InfoWindow onCloseClick={() => setOpenInfo(false)}>
                     <div className="text-black font-poppins text-xs shadow-lg pr-4 relative z-50">
                       <div className="font-medium py-2">
-                        <p>
-                          {currentLocation} : {place?.country}
-                        </p>
+                        {place?.country && (
+                          <p>
+                            {currentLocation} : {place?.country}
+                          </p>
+                        )}
                       </div>
 
                       <div>

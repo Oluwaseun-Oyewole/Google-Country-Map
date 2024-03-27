@@ -21,7 +21,7 @@ export const POST = async (req: NextRequest) => {
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     } else {
-      const cityExist = await CityModel.findOne({ name });
+      const cityExist = await CityModel.findOne({ name, user });
       if (cityExist) {
         return NextResponse.json(
           { message: "City Already Exist" },

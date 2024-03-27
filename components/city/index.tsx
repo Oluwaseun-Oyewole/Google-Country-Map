@@ -157,6 +157,7 @@ const City = () => {
                                   country?.location?.coordinates[1]
                                 )
                               }
+                              className="text-[10px] py-2"
                             >
                               Image should be here{" "}
                             </p>

@@ -494,6 +494,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
         <Modal
           ref={modalRef}
           textObj={{ text: t("closeModal"), message: t("placeAdded") }}
+          modalClassName="text-xs"
         >
           <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
             <GooglePlaceSearch
@@ -555,7 +556,11 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
           <div className="flex flex-col items-center pb-7">
             <div className="flex gap-4 w-[80%]">
               <Button
-                onClick={() => signOut({ callbackUrl: "/weather" })}
+                onClick={() => {
+                  console.log("handling logout");
+                  signOut({ redirect: false, callbackUrl: "/" });
+                  router.push("/");
+                }}
                 className=" !bg-white !text-black "
               >
                 Yes
@@ -589,7 +594,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
               <div className="flex gap-5 items-center">
                 <LanguageSwitcher i18n={i18n} lng={lng} path="" />
 
-                <div onClick={handleLogout}>
+                <div onClick={() => signOut({ callbackUrl: "/weather" })}>
                   <Image
                     src={Logout}
                     alt="icon"

@@ -11,6 +11,7 @@ export const handleRequestError = (
   if (statusCode?.startsWith("4") || statusCode?.startsWith("5")) {
     const data = error?.response?.data;
     useMessage =
+      truncate(data, 53) ||
       truncate(data?.message, 60) ||
       data?.message ||
       (data?.errors && data?.errors[0]?.message) ||
