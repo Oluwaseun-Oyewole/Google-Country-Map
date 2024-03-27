@@ -4,7 +4,7 @@
   "display": "standalone",
   "scope": "/",
   "start_url": "/",
-  "name": "Google Weather Map",
+  "name": "Weather Map",
   "short_name": "Weather Map",
   "description": "A weather map application",
   "icons": [
