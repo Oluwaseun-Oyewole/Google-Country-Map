@@ -30,7 +30,6 @@ Typescript
 
 [Google-Weather-Map](https://google-country-weather-map.vercel.app/en)
 
-![screenshot](<assets/Screenshot 2024-02-23 at 13.29.01.png>)
 ![screenshot](<assets/Screenshot 2024-02-23 at 13.28.17.png>)
 ![screenshot](<assets/Screenshot 2024-02-23 at 13.33.52.png>)
 ![screenshot](<assets/Screenshot 2024-02-25 at 22.15.03.png>)

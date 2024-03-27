@@ -486,96 +486,95 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   if (session.status === "authenticated")
     return (
       <Suspense fallback={<Spinner />}>
-        <Modal
-          ref={modal}
-          type="post"
-          textObj={{ text: t("closeModal"), message: t("placeAdded") }}
-        />
-        <Modal
-          ref={modalRef}
-          textObj={{ text: t("closeModal"), message: t("placeAdded") }}
-          modalClassName="text-xs"
-        >
-          <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
-            <GooglePlaceSearch
-              isClassName={false}
-              ref={autoCompleteReference}
-              textObj={{
-                search: t("searchPlace"),
-                mapMessage: t("mapMessage"),
-                clearValue: t("clear"),
-                alert: t("alert"),
-              }}
-            />
-            <div>
-              <div
-                className="cursor-pointer flex gap-2 justify-between items-center w-full"
-                onClick={() => {
-                  fileInputRef.current?.click();
-                }}
-              >
-                <Button>{t("upload")}</Button>
-                <p
-                  className={`text-[12px] w-[20%] flex justify-end ${
-                    file?.name ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  {file ? truncate(file?.name, 10) : t("noFile")}
-                </p>
-              </div>
-              <input
-                type="file"
-                className="hidden"
-                ref={fileInputRef}
-                accept="image/jpeg, image/png, image/jpg, image/*"
-                onChange={(e) => {
-                  if (e.target.files && e.target.files.length > 0) {
-                    setFile(e.target.files[0]);
-                  }
+        <main className="max-w-[92%] md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
+          <Modal
+            ref={modal}
+            type="post"
+            textObj={{ text: t("closeModal"), message: t("placeAdded") }}
+          />
+          <Modal
+            ref={modalRef}
+            textObj={{ text: t("closeModal"), message: t("placeAdded") }}
+            modalClassName="text-xs"
+          >
+            <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
+              <GooglePlaceSearch
+                isClassName={false}
+                ref={autoCompleteReference}
+                textObj={{
+                  search: t("searchPlace"),
+                  mapMessage: t("mapMessage"),
+                  clearValue: t("clear"),
+                  alert: t("alert"),
                 }}
               />
+              <div>
+                <div
+                  className="cursor-pointer flex gap-2 justify-between items-center w-full"
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                  }}
+                >
+                  <Button>{t("upload")}</Button>
+                  <p
+                    className={`text-[12px] w-[20%] flex justify-end ${
+                      file?.name ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {file ? truncate(file?.name, 10) : t("noFile")}
+                  </p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  ref={fileInputRef}
+                  accept="image/jpeg, image/png, image/jpg, image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      setFile(e.target.files[0]);
+                    }
+                  }}
+                />
+              </div>
             </div>
-          </div>
-          <Button
-            className="!bg-primary flex items-center justify-center gap-2"
-            disabled={(!value && true) || loading}
-            onClick={handleSubmit}
+            <Button
+              className="!bg-primary flex items-center justify-center gap-2"
+              disabled={(!value && true) || loading}
+              onClick={handleSubmit}
+            >
+              {loading && <Spinner />} {t("submit")}
+            </Button>
+          </Modal>
+
+          <Modal
+            ref={logoutRef}
+            textObj={{ text: t("closeModal") }}
+            modalClassName="text-xs"
           >
-            {loading && <Spinner />} {t("submit")}
-          </Button>
-        </Modal>
-
-        <Modal
-          ref={logoutRef}
-          textObj={{ text: t("closeModal") }}
-          modalClassName="text-xs"
-        >
-          <p className="text-white py-8 font-medium text-center">
-            Are you sure you want to logout ?
-          </p>
-          <div className="flex flex-col items-center pb-7">
-            <div className="flex gap-4 w-[80%]">
-              <Button
-                onClick={() => {
-                  console.log("handling logout");
-                  signOut({ redirect: false, callbackUrl: "/" });
-                  router.push("/");
-                }}
-                className=" !bg-white !text-black "
-              >
-                Yes
-              </Button>
-              <Button
-                className="!bg-primary"
-                onClick={() => logoutRef?.current?.close()}
-              >
-                Cancel
-              </Button>
+            <p className="text-white py-8 font-medium text-center">
+              Are you sure you want to logout ?
+            </p>
+            <div className="flex flex-col items-center pb-7">
+              <div className="flex gap-4 w-[80%]">
+                <Button
+                  onClick={() => {
+                    console.log("handling logout");
+                    signOut({ redirect: false, callbackUrl: "/" });
+                    router.push("/");
+                  }}
+                  className=" !bg-white !text-black "
+                >
+                  Yes
+                </Button>
+                <Button
+                  className="!bg-primary"
+                  onClick={() => logoutRef?.current?.close()}
+                >
+                  Cancel
+                </Button>
+              </div>
             </div>
-          </div>
-        </Modal>
-
-        <main className="max-w-[92%] md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
+          </Modal>
           <div className=" pl-0 md:pl-8 lg:h-screen lg:overflow-y-scroll">
             <div className="pt-6 sticky top-0 left-0 bg-dark z-20 flex items-center gap-5">
               <div className="w-full md:w-[80%]">

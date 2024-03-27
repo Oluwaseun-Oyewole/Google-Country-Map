@@ -1,10 +1,10 @@
 "use client";
 import Bell from "@/assets/notification-03.svg";
 import Button from "@/components/button";
-import Spinner from "@/components/loader";
 import Map from "@/components/map";
 import Modal, { IModalType } from "@/components/modal";
 import GooglePlaceSearch, { MyObject } from "@/components/search";
+import Spinner from "@/components/spinner";
 import { useCountryData } from "@/context";
 import { weatherInformation } from "@/services/weather";
 import { motion } from "framer-motion";
@@ -101,12 +101,12 @@ export default function Home() {
     router.push("/en");
   }
   return (
-    <Suspense fallback={<Spinner />}>
-      <main className="bg-gray-50">
+    <main className="bg-gray-50">
+      <Suspense fallback={<Spinner />}>
         <div>
           {openNotification && (
             <motion.div
-              className="absolute z-30 top-40 md:top-24 right-3 lg:w-[23%] h-[550px] overflow-y-scroll bg-white text-xs shadow-lg p-4"
+              className="absolute z-30 top-40 md:top-24 right-3 max-h-[500px] lg:w-[23%] overflow-y-scroll bg-white text-xs shadow-lg p-4"
               variants={variants}
               initial="initial"
               animate="animate"
@@ -240,7 +240,7 @@ export default function Home() {
             prep={"prep"}
           />
         </div>
-      </main>
-    </Suspense>
+      </Suspense>
+    </main>
   );
 }

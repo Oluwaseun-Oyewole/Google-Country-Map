@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { poppins } from "../[lng]/fonts";
 import "../[lng]/globals.css";
 import Template from "../[lng]/template";
+import { poppins } from "../fonts";
 import Provider from "../provider/layout";
 
 export const metadata: Metadata = {
@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <Provider>
         <Template>
-          <body className={`${poppins.variable} font-poppins h-[100vh]`}>
+          <body className={`${poppins.variable} font-poppins overflow-hidden`}>
             {children}
             <Script
               type="application/javascript"

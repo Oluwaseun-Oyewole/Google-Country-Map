@@ -3,9 +3,9 @@ import { dir } from "i18next";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
+import { lato, poppins } from "../fonts";
 import { languages } from "../i18n/settings";
 import Provider from "../provider/layout";
-import { lato, poppins } from "./fonts";
 import "./globals.css";
 import Template from "./template";
 
