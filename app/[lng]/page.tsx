@@ -26,7 +26,7 @@ import { motion } from "framer-motion";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CSVLink } from "react-csv";
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css"; // main css file
@@ -207,9 +207,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   const handleOpenModal = () => {
     modalRef?.current?.open();
   };
-  const handleLogout = () => {
-    logoutRef?.current?.open();
-  };
+
   const fetchCountryInfo = async (country: string) => {
     setLoading(true);
     if (!country || (country === "" && !countryName)) {
@@ -485,21 +483,101 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
 
   if (session.status === "authenticated")
     return (
-      <Suspense fallback={<Spinner />}>
-        <main className="max-w-[92%] md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
-          <Modal
-            ref={modal}
-            type="post"
-            textObj={{ text: t("closeModal"), message: t("placeAdded") }}
-          />
-          <Modal
-            ref={modalRef}
-            textObj={{ text: t("closeModal"), message: t("placeAdded") }}
-            modalClassName="text-xs"
+      // <Suspense fallback={<Spinner />}>
+      <main className="max-w-[92%] md:max-w-[100%] mx-auto lg:grid grid-flow-col lg:grid-cols-[55%_40%] lg:justify-between bg-dark text-white">
+        <Modal
+          ref={modal}
+          type="post"
+          textObj={{ text: t("closeModal"), message: t("placeAdded") }}
+        />
+        <Modal
+          ref={modalRef}
+          textObj={{ text: t("closeModal"), message: t("placeAdded") }}
+          modalClassName="text-xs"
+        >
+          <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
+            <GooglePlaceSearch
+              isClassName={false}
+              ref={autoCompleteReference}
+              textObj={{
+                search: t("searchPlace"),
+                mapMessage: t("mapMessage"),
+                clearValue: t("clear"),
+                alert: t("alert"),
+              }}
+            />
+            <div>
+              <div
+                className="cursor-pointer flex gap-2 justify-between items-center w-full"
+                onClick={() => {
+                  fileInputRef.current?.click();
+                }}
+              >
+                <Button>{t("upload")}</Button>
+                <p
+                  className={`text-[12px] w-[20%] flex justify-end ${
+                    file?.name ? "text-green-500" : "text-red-500"
+                  }`}
+                >
+                  {file ? truncate(file?.name, 10) : t("noFile")}
+                </p>
+              </div>
+              <input
+                type="file"
+                className="hidden"
+                ref={fileInputRef}
+                accept="image/jpeg, image/png, image/jpg, image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length > 0) {
+                    setFile(e.target.files[0]);
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <Button
+            className="!bg-primary flex items-center justify-center gap-2"
+            disabled={(!value && true) || loading}
+            onClick={handleSubmit}
           >
-            <div className="py-5 flex gap-5 flex-col max-w-[90%] mx-auto justify-center">
+            {loading && <Spinner />} {t("submit")}
+          </Button>
+        </Modal>
+
+        <Modal
+          ref={logoutRef}
+          textObj={{ text: t("closeModal") }}
+          modalClassName="text-xs"
+        >
+          <p className="text-white py-8 font-medium text-center">
+            Are you sure you want to logout ?
+          </p>
+          <div className="flex flex-col items-center pb-7">
+            <div className="flex gap-4 w-[80%]">
+              <Button
+                onClick={() => {
+                  console.log("handling logout");
+                  signOut({ redirect: false, callbackUrl: "/" });
+                  router.push("/");
+                }}
+                className=" !bg-white !text-black "
+              >
+                Yes
+              </Button>
+              <Button
+                className="!bg-primary"
+                onClick={() => logoutRef?.current?.close()}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </Modal>
+        <div className=" pl-0 md:pl-8 lg:h-screen lg:overflow-y-scroll">
+          <div className="pt-6 sticky top-0 left-0 bg-dark z-20 flex items-center gap-5">
+            <div className="w-full md:w-[80%]">
               <GooglePlaceSearch
-                isClassName={false}
+                isClassName
                 ref={autoCompleteReference}
                 textObj={{
                   search: t("searchPlace"),
@@ -508,211 +586,124 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                   alert: t("alert"),
                 }}
               />
-              <div>
-                <div
-                  className="cursor-pointer flex gap-2 justify-between items-center w-full"
-                  onClick={() => {
-                    fileInputRef.current?.click();
-                  }}
-                >
-                  <Button>{t("upload")}</Button>
-                  <p
-                    className={`text-[12px] w-[20%] flex justify-end ${
-                      file?.name ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {file ? truncate(file?.name, 10) : t("noFile")}
+            </div>
+
+            <div className="flex gap-5 items-center">
+              <LanguageSwitcher i18n={i18n} lng={lng} path="" />
+
+              <div onClick={() => signOut({ callbackUrl: "/weather" })}>
+                <Image src={Logout} alt="icon" className="w-4 cursor-pointer" />
+              </div>
+            </div>
+          </div>
+          <div className="relative pt-8 md:pt-10">
+            <div className="w-full grid grid-flow-col grid-cols-[50%_45%] gap-2 md:grid-cols-[70%_25%] justify-between items-center">
+              <City />
+              <div
+                className="bg-transparent border-2 border-secondary w-full flex flex-col gap-2 items-center justify-center h-[170px] md:h-[190px] rounded-xl cursor-pointer"
+                onClick={handleOpenModal}
+              >
+                <Image src={Plus} alt="add city" />
+                <p>{t("addCity")}</p>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex gap-2 justify-between w-full pt-2 md:pt-10 overflow-scroll">
+                {items?.map((item, index) => {
+                  return (
+                    <motion.div
+                      key={index}
+                      className="bg-secondary px-5 py-3 flex items-center justify-center rounded-sm cursor-not-allowed"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      <Image src={item} alt="" className="w-7" />
+                    </motion.div>
+                  );
+                })}
+              </div>
+              <div className="pt-8 md:pt-16">
+                <div className="flex justify-between items-center text-sm text-[#ACAFC8] pb-4">
+                  <p>
+                    {countryParam} {t("weatherForecast")}
                   </p>
+                  <p className="text-xs">{t("monthlyForecast")}</p>
                 </div>
-                <input
-                  type="file"
-                  className="hidden"
-                  ref={fileInputRef}
-                  accept="image/jpeg, image/png, image/jpg, image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files.length > 0) {
-                      setFile(e.target.files[0]);
-                    }
-                  }}
-                />
-              </div>
-            </div>
-            <Button
-              className="!bg-primary flex items-center justify-center gap-2"
-              disabled={(!value && true) || loading}
-              onClick={handleSubmit}
-            >
-              {loading && <Spinner />} {t("submit")}
-            </Button>
-          </Modal>
 
-          <Modal
-            ref={logoutRef}
-            textObj={{ text: t("closeModal") }}
-            modalClassName="text-xs"
-          >
-            <p className="text-white py-8 font-medium text-center">
-              Are you sure you want to logout ?
-            </p>
-            <div className="flex flex-col items-center pb-7">
-              <div className="flex gap-4 w-[80%]">
-                <Button
-                  onClick={() => {
-                    console.log("handling logout");
-                    signOut({ redirect: false, callbackUrl: "/" });
-                    router.push("/");
-                  }}
-                  className=" !bg-white !text-black "
-                >
-                  Yes
-                </Button>
-                <Button
-                  className="!bg-primary"
-                  onClick={() => logoutRef?.current?.close()}
-                >
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </Modal>
-          <div className=" pl-0 md:pl-8 lg:h-screen lg:overflow-y-scroll">
-            <div className="pt-6 sticky top-0 left-0 bg-dark z-20 flex items-center gap-5">
-              <div className="w-full md:w-[80%]">
-                <GooglePlaceSearch
-                  isClassName
-                  ref={autoCompleteReference}
-                  textObj={{
-                    search: t("searchPlace"),
-                    mapMessage: t("mapMessage"),
-                    clearValue: t("clear"),
-                    alert: t("alert"),
-                  }}
-                />
-              </div>
+                <div className="sticky top-0 left-0 z-10 my-5">
+                  <CustomTable
+                    cols={weatherColumns}
+                    rows={weatherData}
+                    isLoading={loading}
+                    availability={t("weatherData")}
+                  />
+                </div>
+                <div className="lg:w-[600px] overflow-x-scroll mt-10">
+                  <p className="text-xs pb-4">{t("note")}</p>
+                  <DateRangePicker
+                    onChange={(item: any) => {
+                      setState([item.selection]);
+                      if (state) {
+                        filterWeatherInformation({
+                          startDate: format(
+                            item.selection.startDate,
+                            "yyyy-MM-dd"
+                          ),
+                          endDate: format(item.selection.endDate, "yyyy-MM-dd"),
+                        });
+                      }
+                    }}
+                    moveRangeOnFirstSelection={true}
+                    months={1}
+                    ranges={state}
+                    direction="horizontal"
+                  />
+                </div>
 
-              <div className="flex gap-5 items-center">
-                <LanguageSwitcher i18n={i18n} lng={lng} path="" />
+                <div className="flex items-end justify-end py-3">
+                  <Button
+                    className="!w-[180px] !bg-primary text-xs"
+                    disabled={!areaSeries[0]?.data?.length}
+                  >
+                    <CSVLink data={areaSeries} className="text-xs py-5 px-7">
+                      {t("download")}
+                    </CSVLink>
+                  </Button>
+                </div>
+                {weatherForecastArray ? (
+                  <WeatherChart
+                    id="area-chart"
+                    type="line"
+                    colors={["#B619A6", "#380ABB", "#fff", "#00FF00"]}
+                    series={areaSeries}
+                    categories={chartDates}
+                    curve="smooth"
+                    width={"100%"}
+                  />
+                ) : (
+                  <WeatherChart
+                    id="area-chart"
+                    type="line"
+                    colors={["#B619A6", "#380ABB"]}
+                    series={[]}
+                    categories={[]}
+                    curve="smooth"
+                    width={"100%"}
+                  />
+                )}
 
-                <div onClick={() => signOut({ callbackUrl: "/weather" })}>
-                  <Image
-                    src={Logout}
-                    alt="icon"
-                    className="w-4 cursor-pointer"
+                <div className="mt-7 mb-4 md:h-[45vh] sticky top-0 left-0 z-10 overflow-y-scroll">
+                  <CustomTable
+                    cols={weatherSummaryColumns}
+                    rows={weatherForecastArray}
+                    isLoading={loading}
+                    availability={t("weatherData")}
                   />
                 </div>
               </div>
             </div>
-            <div className="relative pt-8 md:pt-10">
-              <div className="w-full grid grid-flow-col grid-cols-[50%_45%] gap-2 md:grid-cols-[70%_25%] justify-between items-center">
-                <City />
-                <div
-                  className="bg-transparent border-2 border-secondary w-full flex flex-col gap-2 items-center justify-center h-[170px] md:h-[190px] rounded-xl cursor-pointer"
-                  onClick={handleOpenModal}
-                >
-                  <Image src={Plus} alt="add city" />
-                  <p>{t("addCity")}</p>
-                </div>
-              </div>
 
-              <div>
-                <div className="flex gap-2 justify-between w-full pt-2 md:pt-10 overflow-scroll">
-                  {items?.map((item, index) => {
-                    return (
-                      <motion.div
-                        key={index}
-                        className="bg-secondary px-5 py-3 flex items-center justify-center rounded-sm cursor-not-allowed"
-                        whileHover={{ scale: 1.1 }}
-                      >
-                        <Image src={item} alt="" className="w-7" />
-                      </motion.div>
-                    );
-                  })}
-                </div>
-                <div className="pt-8 md:pt-16">
-                  <div className="flex justify-between items-center text-sm text-[#ACAFC8] pb-4">
-                    <p>
-                      {countryParam} {t("weatherForecast")}
-                    </p>
-                    <p className="text-xs">{t("monthlyForecast")}</p>
-                  </div>
-
-                  <div className="sticky top-0 left-0 z-10 my-5">
-                    <CustomTable
-                      cols={weatherColumns}
-                      rows={weatherData}
-                      isLoading={loading}
-                      availability={t("weatherData")}
-                    />
-                  </div>
-                  <div className="lg:w-[600px] overflow-x-scroll mt-10">
-                    <p className="text-xs pb-4">{t("note")}</p>
-                    <DateRangePicker
-                      onChange={(item: any) => {
-                        setState([item.selection]);
-                        if (state) {
-                          filterWeatherInformation({
-                            startDate: format(
-                              item.selection.startDate,
-                              "yyyy-MM-dd"
-                            ),
-                            endDate: format(
-                              item.selection.endDate,
-                              "yyyy-MM-dd"
-                            ),
-                          });
-                        }
-                      }}
-                      moveRangeOnFirstSelection={true}
-                      months={1}
-                      ranges={state}
-                      direction="horizontal"
-                    />
-                  </div>
-
-                  <div className="flex items-end justify-end py-3">
-                    <Button
-                      className="!w-[180px] !bg-primary text-xs"
-                      disabled={!areaSeries[0]?.data?.length}
-                    >
-                      <CSVLink data={areaSeries} className="text-xs py-5 px-7">
-                        {t("download")}
-                      </CSVLink>
-                    </Button>
-                  </div>
-                  {weatherForecastArray ? (
-                    <WeatherChart
-                      id="area-chart"
-                      type="line"
-                      colors={["#B619A6", "#380ABB", "#fff", "#00FF00"]}
-                      series={areaSeries}
-                      categories={chartDates}
-                      curve="smooth"
-                      width={"100%"}
-                    />
-                  ) : (
-                    <WeatherChart
-                      id="area-chart"
-                      type="line"
-                      colors={["#B619A6", "#380ABB"]}
-                      series={[]}
-                      categories={[]}
-                      curve="smooth"
-                      width={"100%"}
-                    />
-                  )}
-
-                  <div className="mt-7 mb-4 md:h-[45vh] sticky top-0 left-0 z-10 overflow-y-scroll">
-                    <CustomTable
-                      cols={weatherSummaryColumns}
-                      rows={weatherForecastArray}
-                      isLoading={loading}
-                      availability={t("weatherData")}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* <div className="grid grid-flow-col grid-cols-[auto] items-start overflow-x-scroll gap-2 py-6 lg:pb-8">
+            {/* <div className="grid grid-flow-col grid-cols-[auto] items-start overflow-x-scroll gap-2 py-6 lg:pb-8">
               {loading ? (
                 <div className="flex items-center justify-center">
                   <Spinner />
@@ -739,41 +730,41 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                 </>
               )}
             </div> */}
-            </div>
           </div>
+        </div>
 
-          <div className="w-full sticky top-0 left-0 z-20 flex flex-col justify-between pb-8 h-[100vh] overflow-y-scroll">
-            <div className="h-[80vh]">
-              <Map
-                coordinates={t("coordinates")}
-                currentLocation={t("currentLocation")}
-                locationDetails={t("locationDetails")}
-                url={t("url")}
-                website={t("website")}
-                weatherInfo={t("weatherInfo")}
-                summary={t("summary")}
-                temperature={t("temperature")}
-                pressure={t("pressure")}
-                humidity={t("humidity")}
-                dewPoint={t("dewPoint")}
-                windChill={t("windChill")}
-                mapOfflineMessage={t("mapOfflineMessage")}
-                name={t("name")}
-                noWeather={t("noWeather")}
-                prep={t("prep")}
-              />
-            </div>
-            <div className="md:h-[30vh] sticky top-0 left-0 z-10 overflow-y-scroll">
-              <CustomTable
-                cols={columns}
-                rows={tableArray}
-                isLoading={loading}
-                availability={t("availability")}
-                isHeight
-              />
-            </div>
+        <div className="w-full sticky top-0 left-0 z-20 flex flex-col justify-between pb-8 h-[100vh] overflow-y-scroll">
+          <div className="h-[80vh]">
+            <Map
+              coordinates={t("coordinates")}
+              currentLocation={t("currentLocation")}
+              locationDetails={t("locationDetails")}
+              url={t("url")}
+              website={t("website")}
+              weatherInfo={t("weatherInfo")}
+              summary={t("summary")}
+              temperature={t("temperature")}
+              pressure={t("pressure")}
+              humidity={t("humidity")}
+              dewPoint={t("dewPoint")}
+              windChill={t("windChill")}
+              mapOfflineMessage={t("mapOfflineMessage")}
+              name={t("name")}
+              noWeather={t("noWeather")}
+              prep={t("prep")}
+            />
           </div>
-        </main>
-      </Suspense>
+          <div className="md:h-[30vh] sticky top-0 left-0 z-10 overflow-y-scroll">
+            <CustomTable
+              cols={columns}
+              rows={tableArray}
+              isLoading={loading}
+              availability={t("availability")}
+              isHeight
+            />
+          </div>
+        </div>
+      </main>
+      // </Suspense>
     );
 }
