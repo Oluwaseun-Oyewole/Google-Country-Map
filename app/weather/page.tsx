@@ -32,14 +32,12 @@ export default function Home() {
     setOpenInfo,
     place,
   } = useCountryData();
-
   const autoCompleteReference = useRef(null);
   const modalRef = useRef<IModalType>(null);
   const [countries, setCountries] = useState([]);
   const searchParams = useSearchParams();
   const formatted_address =
     place?.country.split(",")[place?.country?.split.length - 1];
-
   const splitPlace = place?.country?.split(",");
   const formattedCountryAddress = splitPlace[splitPlace.length - 1];
   const router = useRouter();
@@ -100,6 +98,7 @@ export default function Home() {
   if (session.status === "authenticated") {
     router.push("/en");
   }
+
   return (
     <main className="bg-gray-50">
       <Suspense fallback={<Spinner />}>

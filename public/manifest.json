@@ -5,8 +5,8 @@
   "scope": "/",
   "start_url": "/",
   "name": "Google Weather Map",
-  "short_name": "Google Weather Map",
-  "description": "A google weather map application",
+  "short_name": "Weather Map",
+  "description": "A weather map application",
   "icons": [
     {
       "src": "/icon-192x192.png",
