@@ -210,7 +210,8 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
 
   const fetchCountryInfo = async (country: string) => {
     setLoading(true);
-    if (!country || (country === "" && !countryName)) {
+    if (languages.indexOf(lng) < 0) return;
+    if (!country && !countryName) {
       setLoading(false);
     } else {
       try {
@@ -247,6 +248,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
 
   const fetchWeatherInfo = async () => {
     setLoading(true);
+    if (languages.indexOf(lng) < 0) return;
     const res = await weatherInformation(
       `${coordinate.lat},${coordinate.lng}/today`,
       {
@@ -258,11 +260,13 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
     }
     setLoading(false);
   };
+
   const filterWeatherInformation = async ({
     startDate,
     endDate,
   }: IFilterProps) => {
     setLoading(true);
+    if (languages.indexOf(lng) < 0) return;
     const res = await FilterWeatherInformation(
       `${coordinate.lat},${coordinate.lng}/${startDate}/${endDate}`
     );
