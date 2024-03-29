@@ -13,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BsGithub } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
+import { IoMdLogIn } from "react-icons/io";
 
 export default function Weather() {
   const session = useSession();
@@ -197,7 +198,7 @@ export default function Weather() {
               className="text-xs cursor-pointer hover:text-blue-400"
               onClick={handleOpenModal}
             >
-              Explore
+              <IoMdLogIn className="text-xl font-medium" />
             </p>
             <div
               className="relative"
