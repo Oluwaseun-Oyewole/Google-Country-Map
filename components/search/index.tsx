@@ -95,11 +95,6 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
     handleIsNotificationOpen();
   };
 
-  // const handleFetch = async () => {
-  //   const res = await getAllUserCities({ email: "s@gmail.com" });
-  //   console.log("response", res);
-  // };
-
   const options = {
     fields: [
       "formatted_address",
@@ -187,9 +182,6 @@ const GooglePlaceSearch: React.ForwardRefRenderFunction<
           className="pac-input"
         />
       </Online>
-
-      <br />
-      {/* {info && <Image src={`${info.icon}`} alt="" width={50} height={50} />} */}
     </div>
   );
 };

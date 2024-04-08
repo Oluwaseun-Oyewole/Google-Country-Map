@@ -57,6 +57,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   const { i18n } = useTranslation(lng);
   const [weatherForecastArray, setWeatherForecastArray] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const {
     value,
     setValue,
@@ -69,11 +70,13 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   } = useCountryData();
   const cache = useRef<any>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File | null>(null);
   const modalRef = useRef<IModalType>(null);
   const modal = useRef<IModalType>(null);
   const logoutRef = useRef<IModalType>(null);
   const [, setWeatherChartData] = useState([]);
+  const { data } = session;
+  const [image, setImage] = useState<File | null>(null);
+  const [url, setUrl] = useState("");
   const autoCompleteReference = useRef(null);
   const countryRegex = /<span class="country-name">(.*?)<\/span>/;
   const match = countryName.match(countryRegex);
@@ -281,59 +284,58 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
   }, [country, countryName, coordinate]);
 
   useEffect(() => {
-    // fetchChartWeatherForecast(country);
-  }, [country]);
-
-  useEffect(() => {
     fetchWeatherInfo();
   }, [coordinate]);
 
-  const { data } = session;
   const handleSubmit = async () => {
-    if (!value) return;
+    if (!value || !image) return;
+
+    const formData = new FormData();
+    formData.append("file", image as File);
+    formData.append("upload_preset", "weather");
+
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env
+          .NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME!}/image/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const res = await response.json();
+      setUrl(res.public_id);
+    } catch (error) {
+      return;
+    }
+    setIsSubmitting(true);
     setLoading(true);
+
     try {
       const res = await city({
         name: value,
-        image: "image.png",
+        image: `${
+          url
+            ? url
+            : `https://res.cloudinary.com/dgvoxqjr2/image/upload/v1712578369/country_rlq3kv.jpg`
+        }`,
         email: data?.user?.email!,
         coordinates: { ...coordinate },
       });
       if (res?.statusCode === 201) {
         Toastify.success(res?.message);
         modalRef?.current?.close();
-        setFile(null);
+        setImage(null);
         setValue("");
         setLoading(false);
       }
-      setLoading(false);
     } catch (error) {
       setLoading(false);
       Toastify.error("An error ocurred");
     }
-
-    // modal?.current?.open();
-
-    // flor handling file submission
-
-    const formData = new FormData();
-    formData.append("file", file as File);
-    formData.append("upload_preset", "ml_default");
-
-    // if (!uploadRQSTController) {
-    //   uploadRQSTController = new AbortController();
-    // }
-    // try {
-    //   const response = await axios({
-    //     url: "https://api.cloudinary.com/v1_1/dcmifr1mx/image/upload",
-    //     method: "POST",
-    //     data: formData,
-    //     signal: uploadRQSTController.signal,
-    //   });
-    //   console.log(response);
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    setLoading(false);
+    setIsSubmitting(false);
+    setImage(null);
   };
 
   const temps = weatherForecastArray?.map(
@@ -519,10 +521,10 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                 <Button>{t("upload")}</Button>
                 <p
                   className={`text-[12px] w-[20%] flex justify-end ${
-                    file?.name ? "text-green-500" : "text-red-500"
+                    image?.name ? "text-green-500" : "text-red-500"
                   }`}
                 >
-                  {file ? truncate(file?.name, 10) : t("noFile")}
+                  {image ? truncate(image?.name, 10) : t("noFile")}
                 </p>
               </div>
               <input
@@ -532,7 +534,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
                 accept="image/jpeg, image/png, image/jpg, image/*"
                 onChange={(e) => {
                   if (e.target.files && e.target.files.length > 0) {
-                    setFile(e.target.files[0]);
+                    setImage(e.target.files[0]);
                   }
                 }}
               />
@@ -540,7 +542,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
           </div>
           <Button
             className="!bg-primary flex items-center justify-center gap-2"
-            disabled={(!value && true) || loading}
+            disabled={(!value && true) || loading || !image}
             onClick={handleSubmit}
           >
             {loading && <Spinner />} {t("submit")}
@@ -559,7 +561,6 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
             <div className="flex gap-4 w-[80%]">
               <Button
                 onClick={() => {
-                  console.log("handling logout");
                   signOut({ redirect: false, callbackUrl: "/" });
                   router.push("/");
                 }}
@@ -601,7 +602,7 @@ export default function Home({ params: { lng } }: { params: { lng: string } }) {
           </div>
           <div className="relative pt-8 md:pt-10">
             <div className="w-full grid grid-flow-col grid-cols-[50%_45%] gap-2 md:grid-cols-[70%_25%] justify-between items-center">
-              <City />
+              <City reloadFlag={isSubmitting} />
               <div
                 className="bg-transparent border-2 border-secondary w-full flex flex-col gap-2 items-center justify-center h-[170px] md:h-[190px] rounded-xl cursor-pointer"
                 onClick={handleOpenModal}

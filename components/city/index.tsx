@@ -3,6 +3,7 @@ import { truncate } from "@/helper";
 import { deleteCity, getAllUserCities } from "@/services/city";
 import { Toastify } from "@/utils/toast";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
@@ -21,11 +22,11 @@ import Spinner from "../spinner";
 
 interface CountryInterface {
   name: string;
+  image: string;
   location: { coordinates: Array<number> };
 }
-const City = () => {
+const City = ({ reloadFlag }: { reloadFlag: boolean }) => {
   const {
-    value,
     setCoordinate,
     coordinate,
     addPlace,
@@ -87,12 +88,12 @@ const City = () => {
       long: lng,
     });
     setCountryName(formattedPlace);
-    // setValue(formattedPlace);
     updateURLFromSearchQuery(formattedPlace);
   };
+
   useEffect(() => {
     fetchCountries();
-  }, [value]);
+  }, [reloadFlag]);
 
   return (
     <div className={` overflow-scroll`}>
@@ -117,7 +118,7 @@ const City = () => {
             },
             768: {
               slidesPerView: 3,
-              spaceBetween: 5,
+              spaceBetween: 10,
             },
             1024: {
               slidesPerView: 3,
@@ -142,7 +143,7 @@ const City = () => {
                       <SwiperSlide key={index}>
                         <div
                           key={index}
-                          className={`flex w-full md:w-[170px] lg:w-[200px] min-h-[200px] pt-7 pb-5 rounded-lg justify-between hover:scale-105 transition-all ease-in-out duration-500 cursor-pointer`}
+                          className={`flex gap-4 w-full md:w-[170px] lg:w-[200px] min-h-[200px] pt-7 pb-5 rounded-lg justify-between cursor-pointer`}
                         >
                           <div key={index}>
                             <p className="text-center text-xs !font-light flex gap-1 items-center">
@@ -162,10 +163,14 @@ const City = () => {
                               }
                               className="text-[10px] py-2"
                             >
-                              Image upload feature soon...
+                              <Image
+                                src={`${country?.image}`}
+                                alt="country image"
+                                className="h-[170px] md:h-[180px] w-[160px] rounded-md"
+                                width={200}
+                                height={100}
+                              />
                             </p>
-
-                            {/* <Image src={country?.image} alt="country image" /> */}
                           </div>
                         </div>
                       </SwiperSlide>
@@ -173,7 +178,7 @@ const City = () => {
                   })}
                 </>
               ) : (
-                <p className="text-center">No City Available</p>
+                <p className="text-center text-sm">No City Available</p>
               )}
             </div>
           )}
@@ -184,15 +189,3 @@ const City = () => {
 };
 
 export default City;
-
-/* {file ? (
-                      <di>
-                        <Image
-                          src={URL.createObjectURL(file)}
-                          alt="country image"
-                          width={100}
-                          height={150}
-                          className=""
-                        />
-                      
-                        */
